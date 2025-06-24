@@ -1,1 +1,57 @@
 @import "tailwindcss";
+
+
+@theme {
+  /* Background Colors */
+  --theme-dark-background-primary: #0B0E11;
+  --theme-dark-background-secondary: #1E2329;
+
+  /* Primary and Secondary Colors (Yellow) */
+  --theme-dark-primary-yellow: #F0B90B;
+  --theme-dark-secondary-yellow: #FCD535;
+
+  /* Text Colors */
+  --theme-dark-text-light: #EAECEF;
+  --theme-dark-text-secondary: #FAFAFA;
+  --theme-dark-text-white: #FFFFFF;
+}
+
+@font-face {
+  font-family: "Sansation";
+  src: url("../public/Fonts/Sansation-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sansation";
+  src: url("../public/Fonts/Sansation-Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sansation";
+  src: url("../public/Fonts/Sansation-Italic.ttf") format("truetype");
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Sansation";
+  src: url("../public/Fonts/Sansation-BoldItalic.ttf") format("truetype");
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Sansation";
+  src: url("../public/Fonts/Sansation-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+
+body{
+    font-family: 'Sansation';
+}

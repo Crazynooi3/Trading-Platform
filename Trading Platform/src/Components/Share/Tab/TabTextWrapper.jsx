@@ -1,5 +1,4 @@
 import React from "react";
-import "./../../../Style/TabTextWrapper.css";
 
 export default function TabTextWrapper() {
   return (

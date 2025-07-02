@@ -1,12 +1,9 @@
-import React from "react";
-import BuyBtn from "../Components/Share/Btn/BuyBtn";
-import SellBtn from "../Components/Share/Btn/SellBtn";
+import TabTextWrapper from "../Components/Share/Tab/TabTextWrapper";
 
 export default function Index() {
   return (
-    <>
-      <BuyBtn />
-      <SellBtn />
-    </>
+    <div className="p-20">
+      <TabTextWrapper />
+    </div>
   );
 }

@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <div
       id="header_wrapper"
-      className="bg-base-base1 mb-1 flex h-16 items-center px-4"
+      className="bg-base-base1 border-border-border1 mb-1 flex h-16 items-center border-b px-4"
     >
       <div id="header_wrapper_left" className="flex items-center">
         {/* Logo */}

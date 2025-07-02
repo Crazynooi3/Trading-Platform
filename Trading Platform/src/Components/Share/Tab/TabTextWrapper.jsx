@@ -2,7 +2,7 @@ import React from "react";
 
 export default function TabTextWrapper() {
   return (
-    <div className="flex h-12 w-fit items-center justify-between gap-2">
+    <div className="z-10 flex h-12 w-fit items-center justify-between">
       {/* Open Tab */}
       <div className="relative h-10 w-36">
         <div className="bg-success-success1 h-full w-[80%] rounded-tl-lg rounded-bl-lg"></div>

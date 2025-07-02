@@ -101,7 +101,7 @@
   --color-secondary-secondary4: #3f4249;
   --color-secondary-secondary5: #54565f;
   --color-secondary-secondary6: #686b74;
-  --color-color-danger-danger1: #f53d55;
+  --color-danger-danger1: #f53d55;
   --color-danger-danger2: #e52740;
   --color-danger-danger3: #fe5d72;
   --color-danger-danger4: #44212b;
@@ -215,4 +215,7 @@ html {
     微软雅黑,
     Arial,
     sans-serif !important;
+}
+body {
+  background-color: var(--color-base-base1);
 }

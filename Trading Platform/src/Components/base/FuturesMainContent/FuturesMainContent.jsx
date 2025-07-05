@@ -11,7 +11,9 @@ export default function FuturesMainContent() {
       <div className="border-border-border1 col-span-2 border-l text-white">
         <ElTabs />
         <FuturesMarginTabs />
-        <TabTextWrapper />
+        <div className="">
+          <TabTextWrapper />
+        </div>
       </div>
     </div>
   );

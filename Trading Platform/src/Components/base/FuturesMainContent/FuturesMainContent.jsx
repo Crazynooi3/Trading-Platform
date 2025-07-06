@@ -3,6 +3,7 @@ import ElTabs from "../../Share/Tab/ElTabs";
 import TabTextWrapper from "../../Share/Tab/TabTextWrapper";
 import FuturesMarginTabs from "../../Share/Tab/FuturesMarginTabs";
 import OrderPlace from "../Ordering/OrderPlace";
+import SpotSlider from "../../Share/Sliders/SpotSlider";
 
 export default function FuturesMainContent() {
   return (
@@ -14,6 +15,7 @@ export default function FuturesMainContent() {
         <FuturesMarginTabs />
         <TabTextWrapper />
         <OrderPlace />
+        <SpotSlider />
       </div>
     </div>
   );

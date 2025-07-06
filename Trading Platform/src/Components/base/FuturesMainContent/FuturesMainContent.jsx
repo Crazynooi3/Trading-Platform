@@ -2,6 +2,7 @@ import React from "react";
 import ElTabs from "../../Share/Tab/ElTabs";
 import TabTextWrapper from "../../Share/Tab/TabTextWrapper";
 import FuturesMarginTabs from "../../Share/Tab/FuturesMarginTabs";
+import OrderPlace from "../Ordering/OrderPlace";
 
 export default function FuturesMainContent() {
   return (
@@ -11,9 +12,8 @@ export default function FuturesMainContent() {
       <div className="border-border-border1 col-span-2 border-l text-white">
         <ElTabs />
         <FuturesMarginTabs />
-        <div className="">
-          <TabTextWrapper />
-        </div>
+        <TabTextWrapper />
+        <OrderPlace />
       </div>
     </div>
   );

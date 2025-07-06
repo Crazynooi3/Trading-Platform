@@ -9,9 +9,6 @@ export default function Index() {
       <Header />
       <Notice />
       <FuturesMainContent />
-      <div className="p-20">
-        <TabTextWrapper />
-      </div>
     </>
   );
 }

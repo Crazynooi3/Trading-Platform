@@ -10,7 +10,7 @@ export default function FuturesMainContent() {
   return (
     <div className="grid h-lvh grid-cols-10">
       <div className="col-span-6 text-white">1</div>
-      <div className="col-span-2 text-white">
+      <div className="col-span-2 h-lvh text-white">
         <OrderBook />
       </div>
       <div className="border-border-border1 col-span-2 border-l text-white">

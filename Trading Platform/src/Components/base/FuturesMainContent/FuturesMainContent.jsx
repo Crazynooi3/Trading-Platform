@@ -10,9 +10,9 @@ import OrderBookHeader from "../OrderBook/OrderBookHeader";
 
 export default function FuturesMainContent() {
   return (
-    <div className="grid h-lvh grid-cols-10">
+    <div className="grid grid-cols-10">
       <div className="col-span-6 text-white">1</div>
-      <div className="border-border-border1 col-span-2 h-lvh border-l text-white">
+      <div className="border-border-border1 col-span-2 border-l text-white">
         <OrderBookTabs />
         <OrderBookHeader />
         <OrderBook />

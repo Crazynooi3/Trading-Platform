@@ -5,9 +5,11 @@ export default function OrderPlace() {
   return (
     <div className="mt-4 px-4">
       <div className="flex items-center justify-between text-sm">
-        <span>Market</span>
-        <span>Limit</span>
-        <span>Trigger Order</span>
+        <div className="space-x-4">
+          <span>Market</span>
+          <span>Limit</span>
+          <span>Trigger Order</span>
+        </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"

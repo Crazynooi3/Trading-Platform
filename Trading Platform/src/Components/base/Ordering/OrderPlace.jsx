@@ -7,8 +7,8 @@ export default function OrderPlace() {
       <div className="flex items-center justify-between text-sm">
         <div className="space-x-4">
           <span>Market</span>
-          <span>Limit</span>
-          <span>Trigger Order</span>
+          <span className="text-text-text3">Limit</span>
+          <span className="text-text-text3">Trigger Order</span>
         </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"

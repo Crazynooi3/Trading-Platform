@@ -7,6 +7,7 @@ import SpotSlider from "../../Share/Sliders/SpotSlider";
 import OrderBook from "../OrderBook/OrderBook";
 import OrderBookTabs from "../../Share/Tab/OrderBookTabs";
 import OrderBookHeader from "../OrderBook/OrderBookHeader";
+import TPSL from "../Ordering/TPSL";
 
 export default function FuturesMainContent() {
   return (
@@ -24,18 +25,7 @@ export default function FuturesMainContent() {
         <OrderPlace />
         <SpotSlider />
         {/* TP/SL Component */}
-        <div className="border-border-border1 mx-4 my-3 flex h-8 items-center border-t border-b">
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="TP/SL"
-              className="border-border-border2 h-3 w-3 appearance-none rounded-xs border"
-            />
-            <label htmlFor="TP/SL" className="text-xs">
-              TP/SL
-            </label>
-          </div>
-        </div>
+        <TPSL />
       </div>
     </div>
   );

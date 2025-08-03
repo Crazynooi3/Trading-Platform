@@ -43,7 +43,7 @@ export default function OrderPlace() {
           />
         </svg>
       </div>
-      <OrderInput />
+      <OrderInput text="Size" detail=" XRP" />
     </div>
   );
 }

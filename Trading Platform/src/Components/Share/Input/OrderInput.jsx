@@ -1,10 +1,12 @@
 import React from "react";
 
-export default function OrderInput() {
+export default function OrderInput(props) {
   return (
     <div className="mt-2">
       <div className="bg-fill-fill4 flex h-10 w-full items-center rounded-lg px-2.5 outline-white focus-within:outline hover:outline">
-        <span className="text-text-text4 mr-1 text-sm">Size</span>
+        <span className="text-text-text4 mr-1 text-sm text-nowrap">
+          {props.text}
+        </span>
         <input
           type="text"
           pattern="[0-9]*"
@@ -14,7 +16,7 @@ export default function OrderInput() {
           className="mr-3 w-full text-xs outline-0 focus:outline-0"
         />
         <span className="flex items-center">
-          <span className="mr-1 text-sm text-white">XRP</span>
+          <span className="mr-1 text-sm text-white">{props.detail}</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 320 512"

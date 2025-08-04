@@ -8,6 +8,7 @@ import OrderBook from "../OrderBook/OrderBook";
 import OrderBookTabs from "../../Share/Tab/OrderBookTabs";
 import OrderBookHeader from "../OrderBook/OrderBookHeader";
 import TPSL from "../Ordering/TPSL";
+import OpenPosition from "../OpenPosition/OpenPosition";
 
 export default function FuturesMainContent() {
   return (
@@ -26,6 +27,7 @@ export default function FuturesMainContent() {
         <SpotSlider />
         {/* TP/SL Component */}
         <TPSL />
+        <OpenPosition />
       </div>
     </div>
   );

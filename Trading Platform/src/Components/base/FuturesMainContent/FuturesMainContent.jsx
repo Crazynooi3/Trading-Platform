@@ -12,23 +12,25 @@ import OpenPosition from "../OpenPosition/OpenPosition";
 
 export default function FuturesMainContent() {
   return (
-    <div className="grid grid-cols-10">
-      <div className="col-span-6 text-white">1</div>
-      <div className="border-border-border1 col-span-2 border-l text-white">
+    <div className="grid h-screen grid-flow-row grid-cols-10 grid-rows-8">
+      <div className="col-span-6 row-span-6 text-white">1</div>
+      <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
         <OrderBookTabs />
         <OrderBookHeader />
         <OrderBook />
       </div>
-      <div className="border-border-border1 col-span-2 border-l text-white">
+      <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
         <ElTabs />
         <FuturesMarginTabs />
         <TabTextWrapper />
         <OrderPlace />
         <SpotSlider />
-        {/* TP/SL Component */}
         <TPSL />
         <OpenPosition />
       </div>
+
+      {/* <div className="text-text-text0 col-span-8 row-span-2 border">4</div>
+      <div className="text-text-text0 col-span-2 row-span-2 border">5</div> */}
     </div>
   );
 }

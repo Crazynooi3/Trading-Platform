@@ -10,9 +10,9 @@ export default function OrderBook() {
   }, []);
   return (
     <>
-      <div className="mt-1">
+      <div className="mt-1 h-[calc(100%-6.5rem)]">
         {/* Sell part */}
-        <div className="h-1/2">
+        <div className="h-[calc(50%-1.25rem)]">
           <ul
             ref={sellListRef}
             className="hide-scrollbar flex h-full w-full flex-col-reverse justify-start overflow-y-scroll"
@@ -207,7 +207,7 @@ export default function OrderBook() {
           <span className="text-text-text4 text-sm underline">2.2571</span>
         </div>
         {/* Buy part */}
-        <div className="h-1/2">
+        <div className="h-[calc(50%-1.25rem)]">
           <ul className="hide-scrollbar flex h-full w-full flex-col justify-start overflow-y-scroll">
             <li className="flex h-5 w-full items-center justify-between px-4">
               <span className="text-success-success1 w-full text-start text-xs">

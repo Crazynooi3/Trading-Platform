@@ -201,11 +201,40 @@
   font-style: normal;
 }
 
+/* HarmonyOS */
+@font-face {
+  font-family: "HarmonyOS";
+  src: url("../public/Fonts/HarmonyOS_Sans_Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "HarmonyOS";
+  src: url("../public/Fonts/HarmonyOS_Sans_Bold.ttf") format("truetype");
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "HarmonyOS";
+  src: url("../public/Fonts/HarmonyOS_Sans_Medium.ttf") format("truetype");
+  font-weight: medium;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "HarmonyOS";
+  src: url("../public/Fonts/HarmonyOS_Sans_Light.ttf") format("truetype");
+  font-weight: lighter;
+  font-style: normal;
+}
+
 *,
 body,
 html {
   font-family:
-    "Sansation",
+    harmonyOS,
     anjoman,
     Helvetica Neue,
     Helvetica,

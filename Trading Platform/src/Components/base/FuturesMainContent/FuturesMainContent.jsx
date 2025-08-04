@@ -29,8 +29,12 @@ export default function FuturesMainContent() {
         <OpenPosition />
       </div>
 
-      {/* <div className="text-text-text0 col-span-8 row-span-2 border">4</div>
-      <div className="text-text-text0 col-span-2 row-span-2 border">5</div> */}
+      <div className="text-text-text0 border-border-border1 col-span-8 row-span-2 border-t">
+        4
+      </div>
+      <div className="text-text-text0 border-border-border1 col-span-2 row-span-2 border-t border-l">
+        5
+      </div>
     </div>
   );
 }

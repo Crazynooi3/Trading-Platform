@@ -36,12 +36,6 @@ export default function FuturesMainContent() {
                       stroke-linecap="round"
                       fill="none"
                     ></path>
-                    <path
-                      fill-rule="evenodd"
-                      clip-rule="evenodd"
-                      d="M7.6 8.433a.2.2 0 0 1-.2-.2V3.1h1.2v5.133a.2.2 0 0 1-.2.2h-.8Z"
-                      fill="currentColor"
-                    ></path>
                   </svg>
                 </span>
               </div>
@@ -51,6 +45,12 @@ export default function FuturesMainContent() {
                     fill-rule="evenodd"
                     clip-rule="evenodd"
                     d="M.9 1.7c0-.11.09-.2.2-.2h4.994a.2.2 0 0 1 .09.021l1.772.886a.2.2 0 0 0 .16.009l2.408-.903a.2.2 0 0 1 .07-.013H14.9c.11 0 .2.09.2.2v11.8a.2.2 0 0 1-.2.2h-4.594a.2.2 0 0 0-.133.051l-.629.565a.2.2 0 0 1-.133.05H6.594a.2.2 0 0 1-.133-.05l-.633-.565a.2.2 0 0 0-.133-.051H1.1a.2.2 0 0 1-.2-.2V1.7Zm1.4 1a.2.2 0 0 0-.2.2v9.4c0 .11.09.2.2.2h3.853a.2.2 0 0 1 .133.05l.633.566a.2.2 0 0 0 .133.05h1.9a.2.2 0 0 0 .133-.05l.628-.565a.2.2 0 0 1 .134-.051H13.7a.2.2 0 0 0 .2-.2V2.9a.2.2 0 0 0-.2-.2h-2.888a.2.2 0 0 0-.07.013l-2.695 1.01a.2.2 0 0 1-.16-.008L5.902 2.72a.2.2 0 0 0-.09-.021H2.3Z"
+                    fill="currentColor"
+                  ></path>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M7.6 8.433a.2.2 0 0 1-.2-.2V3.1h1.2v5.133a.2.2 0 0 1-.2.2h-.8Z"
                     fill="currentColor"
                   ></path>
                 </svg>

@@ -205,7 +205,7 @@
 @font-face {
   font-family: "HarmonyOS";
   src: url("../public/Fonts/HarmonyOS_Sans_Regular.ttf") format("truetype");
-  font-weight: normal;
+  font-weight: 400;
   font-style: normal;
 }
 
@@ -219,7 +219,7 @@
 @font-face {
   font-family: "HarmonyOS";
   src: url("../public/Fonts/HarmonyOS_Sans_Medium.ttf") format("truetype");
-  font-weight: medium;
+  font-weight: 500;
   font-style: normal;
 }
 

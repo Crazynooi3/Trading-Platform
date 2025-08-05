@@ -9,13 +9,13 @@ import OrderBookTabs from "../../Share/Tab/OrderBookTabs";
 import OrderBookHeader from "../OrderBook/OrderBookHeader";
 import TPSL from "../Ordering/TPSL";
 import OpenPosition from "../OpenPosition/OpenPosition";
-import MyChartComponent from "../../Share/Chart/Chart";
+import Chart from "../../Share/Chart/Chart";
 
 export default function FuturesMainContent() {
   return (
     <div className="grid h-screen grid-flow-row grid-cols-10 grid-rows-8">
       <div className="col-span-6 row-span-6 text-white">
-        <MyChartComponent />
+        <Chart />
       </div>
       <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
         <OrderBookTabs />

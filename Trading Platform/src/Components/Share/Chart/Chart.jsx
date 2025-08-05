@@ -1,6 +1,6 @@
 import { AdvancedChart } from "react-tradingview-embed";
 
-const MyChartComponent = () => {
+const Chart = () => {
   return (
     <AdvancedChart
       widgetProps={{
@@ -14,4 +14,4 @@ const MyChartComponent = () => {
   );
 };
 
-export default MyChartComponent;
+export default Chart;

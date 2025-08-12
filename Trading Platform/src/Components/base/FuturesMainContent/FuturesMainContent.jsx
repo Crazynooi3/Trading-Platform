@@ -61,7 +61,7 @@ export default function FuturesMainContent() {
                 3.0328
               </span>
             </div>
-            <div className="flex items-center pr-5 pl-10">
+            <div className="flex items-center overflow-x-auto pr-5 pl-10">
               <div className="mr-4">
                 <span className="text-text-text4 mb-1 block cursor-help text-xs underline decoration-dashed underline-offset-4">
                   Market Price

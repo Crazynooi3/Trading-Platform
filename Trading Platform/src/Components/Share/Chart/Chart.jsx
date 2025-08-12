@@ -2,17 +2,20 @@ import { AdvancedChart } from "react-tradingview-embed";
 
 const Chart = (props) => {
   return (
-    <div className="h-[calc(100%-64px)]">
+    <div className="custom-height h-[calc(100vh-64px)]">
       <AdvancedChart
         widgetProps={{
           theme: "dark",
           symbol: `BINANCE:${props.symbol}`,
           interval: "1H",
           height: "100%",
-
-          // Add other widget properties as needed
         }}
       />
+      <style jsx>{`
+        .custom-height {
+          height: calc(100% - 64px) !important;
+        }
+      `}</style>
     </div>
   );
 };

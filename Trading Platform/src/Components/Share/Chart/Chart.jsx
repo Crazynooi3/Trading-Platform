@@ -1,16 +1,19 @@
 import { AdvancedChart } from "react-tradingview-embed";
 
-const Chart = () => {
+const Chart = (props) => {
   return (
-    <AdvancedChart
-      widgetProps={{
-        theme: "dark",
-        symbol: "BINANCE:BTCUSDT",
-        interval: "1H",
+    <div className="h-[calc(100%-64px)]">
+      <AdvancedChart
+        widgetProps={{
+          theme: "dark",
+          symbol: `BINANCE:${props.symbol}`,
+          interval: "1H",
+          height: "100%",
 
-        // Add other widget properties as needed
-      }}
-    />
+          // Add other widget properties as needed
+        }}
+      />
+    </div>
   );
 };
 

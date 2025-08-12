@@ -20,7 +20,7 @@ export default function FuturesMainContent() {
           {/* Left */}
           <div className="flex items-center">
             <div className="flex items-center">
-              <div className="group hover:bg-fill-fill4 flex items-center rounded-md px-2 py-1 transition-all">
+              <div className="group hover:bg-fill-fill4 mr-2 flex items-center rounded-md px-2 py-1 transition-all">
                 <div className="flex items-center">
                   <span className="text-xl font-medium">BTCUSDT</span>
                   <span className="text-text-text3 ml-1 text-xs font-semibold">
@@ -190,7 +190,8 @@ export default function FuturesMainContent() {
           {/* right */}
           <div></div>
         </div>
-        <Chart />
+
+        <Chart symbol={"BTCUSDT"} />
       </div>
       <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
         <OrderBookTabs />

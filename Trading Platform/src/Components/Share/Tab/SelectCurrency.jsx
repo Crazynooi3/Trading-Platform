@@ -3,6 +3,7 @@ import OrderBookTabs from "./OrderBookTabs";
 
 export default function SelectCurrency() {
   const [activeTab, setActiveTab] = useState("All");
+  const [activeSort, setActiveSort] = useState("None");
   return (
     <div className="absolute top-14 z-10 hidden transition-all group-hover:block before:absolute before:-top-14 before:h-[60px] before:w-[430px] before:content-[''] hover:block">
       <div className="bg-base-base6 border-border-border1 h-[600px] min-h-[580px] w-[430px] rounded-lg border p-4">
@@ -100,10 +101,47 @@ export default function SelectCurrency() {
         </div>
         {/* Currency List */}
         <div>
-          <div>
-            <span>Currency</span>
-            <span>Last</span>
-            <span>Change</span>
+          <div className="flex items-center justify-between text-xs font-medium">
+            <div className="flex items-center gap-0.5">
+              <span>Currency</span>
+              <img
+                src={
+                  activeSort === "None"
+                    ? "/ShortIcons.png"
+                    : activeSort === "currencyUp"
+                      ? "/ShortIcons-Up.png"
+                      : "/ShortIcons-Down.png"
+                }
+                alt="Sort Icon"
+                className="h-3 w-3 cursor-pointer"
+                onClick={() => {
+                  if (activeSort === "None") {
+                    setActiveSort("currencyUp");
+                  } else if (activeSort === "currencyUp") {
+                    setActiveSort("currencyDown");
+                  } else {
+                    setActiveSort("None");
+                  }
+                }}
+              />
+            </div>
+
+            <div className="flex items-center gap-0.5">
+              <span>Last</span>
+              <img
+                src="./../../../public/ShortIcons.png"
+                alt=""
+                className="h-3 w-3 cursor-pointer"
+              />
+            </div>
+            <div className="flex items-center gap-0.5">
+              <span>Change</span>
+              <img
+                src="./../../../public/ShortIcons.png"
+                alt=""
+                className="h-3 w-3 cursor-pointer"
+              />
+            </div>
           </div>
           <ul>
             <li></li>

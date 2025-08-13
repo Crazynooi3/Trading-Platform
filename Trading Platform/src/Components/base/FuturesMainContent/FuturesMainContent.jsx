@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import ElTabs from "../../Share/Tab/ElTabs";
 import TabTextWrapper from "../../Share/Tab/TabTextWrapper";
 import FuturesMarginTabs from "../../Share/Tab/FuturesMarginTabs";
@@ -12,6 +12,12 @@ import OpenPosition from "../OpenPosition/OpenPosition";
 import Chart from "../../Share/Chart/Chart";
 
 export default function FuturesMainContent() {
+  const [isShowSelectCurency, setShowSelectCurency] = useState(false);
+
+  const isShowModalCurrency = () => {
+    setShowSelectCurency != isShowSelectCurency;
+  };
+
   return (
     <div className="grid h-screen grid-flow-row grid-cols-10 grid-rows-8">
       <div className="col-span-6 row-span-6 text-white">
@@ -19,8 +25,13 @@ export default function FuturesMainContent() {
         <div className="flex h-16 items-center pr-4 pl-2">
           {/* Left */}
           <div className="flex items-center">
-            <div className="flex items-center">
-              <div className="group hover:bg-fill-fill4 mr-2 flex items-center rounded-md px-2 py-1 transition-all">
+            <div className="relative flex items-center">
+              <div className="group hover:bg-fill-fill4 mr-2 flex cursor-pointer items-center rounded-md px-2 py-1 transition-all">
+                {/* Modal Select Currency */}
+                <div className="absolute top-14 z-10 hidden transition-all group-hover:block before:absolute before:-top-14 before:h-[400px] before:w-[430px] before:content-[''] hover:block">
+                  <div className="bg-base-base6 border-border-border1 h-[600px] min-h-[580px] w-[430px] rounded-lg border p-4"></div>
+                </div>
+                {/* top Detile */}
                 <div className="flex items-center">
                   <span className="text-xl font-medium">BTCUSDT</span>
                   <span className="text-text-text3 ml-1 text-xs font-semibold">

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import OrderBookTabs from "../../Share/Tab/OrderBookTabs";
+import OrderBookTabs from "./OrderBookTabs";
 
-export default function Category() {
+export default function SelectCurrency() {
   const [activeTab, setActiveTab] = useState("All");
   return (
     <div className="absolute top-14 z-10 hidden transition-all group-hover:block before:absolute before:-top-14 before:h-[60px] before:w-[430px] before:content-[''] hover:block">
@@ -98,7 +98,17 @@ export default function Category() {
             </li>
           </ul>
         </div>
-        <div></div>
+        {/* Currency List */}
+        <div>
+          <div>
+            <span>Currency</span>
+            <span>Last</span>
+            <span>Change</span>
+          </div>
+          <ul>
+            <li></li>
+          </ul>
+        </div>
       </div>
     </div>
   );

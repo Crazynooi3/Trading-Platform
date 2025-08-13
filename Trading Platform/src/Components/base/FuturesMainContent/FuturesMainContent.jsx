@@ -10,7 +10,7 @@ import OrderBookHeader from "../OrderBook/OrderBookHeader";
 import TPSL from "../Ordering/TPSL";
 import OpenPosition from "../OpenPosition/OpenPosition";
 import Chart from "../../Share/Chart/Chart";
-import Category from "../../Share/Tab/Category";
+import SelectCurrency from "../../Share/Tab/SelectCurrency";
 
 export default function FuturesMainContent() {
   const [isShowSelectCurency, setShowSelectCurency] = useState(false);
@@ -29,7 +29,8 @@ export default function FuturesMainContent() {
             <div className="relative flex items-center">
               <div className="group hover:bg-fill-fill4 mr-2 flex cursor-pointer items-center rounded-md px-2 py-1 transition-all">
                 {/* Modal Select Currency */}
-                <Category />
+                <SelectCurrency />
+
                 {/* top Detile */}
                 <div className="flex items-center">
                   <span className="text-xl font-medium">BTCUSDT</span>

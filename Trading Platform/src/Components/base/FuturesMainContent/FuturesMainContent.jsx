@@ -28,8 +28,27 @@ export default function FuturesMainContent() {
             <div className="relative flex items-center">
               <div className="group hover:bg-fill-fill4 mr-2 flex cursor-pointer items-center rounded-md px-2 py-1 transition-all">
                 {/* Modal Select Currency */}
-                <div className="absolute top-14 z-10 hidden transition-all group-hover:block before:absolute before:-top-14 before:h-[400px] before:w-[430px] before:content-[''] hover:block">
-                  <div className="bg-base-base6 border-border-border1 h-[600px] min-h-[580px] w-[430px] rounded-lg border p-4"></div>
+                <div className="absolute top-14 z-10 hidden transition-all group-hover:block before:absolute before:-top-14 before:h-[60px] before:w-[430px] before:content-[''] hover:block">
+                  <div className="bg-base-base6 border-border-border1 h-[600px] min-h-[580px] w-[430px] rounded-lg border p-4">
+                    {/* search box */}
+                    <div className="hover:border-gray-gray10 border-text-text4 h-8 w-full rounded-md border px-2 py-0.5">
+                      <input
+                        id="search"
+                        type="text"
+                        placeholder="Search"
+                        className="w-full text-xs outline-0 placeholder:text-xs"
+                      />
+                    </div>
+                    <div>
+                      <OrderBookTabs
+                        tab1="Favorites"
+                        tab2="USDT-M Futures"
+                        tab3="USDC Futures"
+                      />
+                    </div>
+                    <div></div>
+                    <div></div>
+                  </div>
                 </div>
                 {/* top Detile */}
                 <div className="flex items-center">
@@ -205,7 +224,7 @@ export default function FuturesMainContent() {
         <Chart symbol={"BTCUSDT"} />
       </div>
       <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
-        <OrderBookTabs />
+        <OrderBookTabs tab1="Order Book" tab2="Trades" />
         <OrderBookHeader />
         <OrderBook />
       </div>

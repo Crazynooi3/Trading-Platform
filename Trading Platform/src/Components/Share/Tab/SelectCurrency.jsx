@@ -5,7 +5,7 @@ export default function SelectCurrency() {
   const [activeTab, setActiveTab] = useState("All");
   const [activeSort, setActiveSort] = useState("None");
   return (
-    <div className="absolute top-14 z-10 hidden transition-all group-hover:block before:absolute before:-top-14 before:h-[60px] before:w-[430px] before:content-[''] hover:block">
+    <div className="absolute top-14 z-10 hidden cursor-auto transition-all group-hover:block before:absolute before:-top-14 before:h-[60px] before:w-[430px] before:content-[''] hover:block">
       <div className="bg-base-base6 border-border-border1 h-[600px] min-h-[580px] w-[430px] rounded-lg border p-4">
         {/* search box */}
         <div className="hover:border-gray-gray10 border-text-text4 h-8 w-full rounded-md border px-2 py-0.5">
@@ -16,6 +16,7 @@ export default function SelectCurrency() {
             className="w-full text-xs outline-0 placeholder:text-xs"
           />
         </div>
+        {/* Tabs */}
         <div>
           <OrderBookTabs
             tab1="Favorites"

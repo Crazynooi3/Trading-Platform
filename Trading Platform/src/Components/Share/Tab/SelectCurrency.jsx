@@ -102,8 +102,8 @@ export default function SelectCurrency() {
         </div>
         {/* Currency List */}
         <div>
-          <div className="flex items-center justify-between text-xs font-medium">
-            <div className="flex items-center gap-0.5">
+          <div className="mt-2 mb-1 flex w-full flex-row flex-nowrap items-center text-xs font-medium">
+            <div className="flex w-[180px] items-center gap-0.5">
               <span>Currency</span>
               <img
                 src={
@@ -126,8 +126,7 @@ export default function SelectCurrency() {
                 }}
               />
             </div>
-
-            <div className="flex items-center gap-0.5">
+            <div className="flex flex-1 items-center justify-end gap-0.5">
               <span>Last</span>
               <img
                 src="./../../../public/ShortIcons.png"
@@ -135,18 +134,40 @@ export default function SelectCurrency() {
                 className="h-3 w-3 cursor-pointer"
               />
             </div>
-            <div className="flex items-center gap-0.5">
+            <div className="flex w-[140px] items-center justify-end gap-0.5">
               <span>Change</span>
               <img
                 src="./../../../public/ShortIcons.png"
                 alt=""
                 className="h-3 w-3 cursor-pointer"
               />
+              <img
+                src="./../../../public/Swap-arrow.png"
+                alt=""
+                className="h-3 w-3 cursor-pointer"
+              />
             </div>
           </div>
-          <ul>
-            <li></li>
-          </ul>
+          <div>
+            <ul>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>

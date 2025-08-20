@@ -445,16 +445,39 @@ export default function SelectCurrency() {
       <style jsx>{`
         .custom-scrollbar {
           overflow-y: scroll;
-          scrollbar-color: transparent transparent;
+          scrollbar-color: transparent transparent; /* برای Firefox */
           box-sizing: content-box;
           padding-right: 4px;
         }
+
         .custom-scrollbar:hover {
-          scrollbar-width: 4px;
+          scrollbar-width: 4px; /* ضخامت در Firefox */
           scrollbar-color: gray transparent;
         }
-        custom-scrollbar::-webkit-scrollbar-button {
+
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px; /* ضخامت اسکرول‌بار در کروم */
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background-color: gray;
+          border-radius: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+
+        /* حذف کامل فلش‌ها و دکمه‌های اسکرول */
+        .custom-scrollbar::-webkit-scrollbar-button:single-button {
           display: none;
+          width: 0;
+          height: 0;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-corner {
+          display: none;
+          background: transparent;
         }
       `}</style>
     </div>

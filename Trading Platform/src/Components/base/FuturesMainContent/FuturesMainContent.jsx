@@ -20,8 +20,8 @@ export default function FuturesMainContent() {
   };
 
   return (
-    <div className="grid h-screen grid-flow-row grid-cols-10 grid-rows-8">
-      <div className="col-span-6 row-span-6 text-white">
+    <div className="grid h-screen grid-flow-row grid-cols-12 grid-rows-8">
+      <div className="col-span-8 row-span-6 text-white">
         {/* Trick */}
         <div className="flex h-16 items-center pr-4 pl-2">
           {/* Left */}

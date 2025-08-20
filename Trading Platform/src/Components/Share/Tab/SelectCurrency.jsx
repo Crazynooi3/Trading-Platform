@@ -101,7 +101,7 @@ export default function SelectCurrency() {
           </ul>
         </div>
         {/* Currency List */}
-        <div>
+        <div className="h-full">
           <div className="mt-2 mb-1 flex w-full flex-row flex-nowrap items-center text-xs font-medium">
             <div className="flex w-[180px] items-center gap-0.5">
               <span>Currency</span>
@@ -148,8 +148,280 @@ export default function SelectCurrency() {
               />
             </div>
           </div>
-          <div>
-            <ul>
+          <div className="hide-scrollbar h-[calc(100%-130px)] overflow-y-scroll">
+            <ul className="overflow-auto">
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-fill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">XRPUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-danger-danger1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
+              <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
+                <div className="flex w-[180px] items-center">
+                  <img
+                    src="./../../../public/Star-nofill.png"
+                    alt="Star no fill"
+                    className="mr-1 h-4 w-4 cursor-pointer"
+                  />
+                  <span className="text-sm font-medium uppercase">BTCUSDT</span>
+                </div>
+                <div className="flex flex-1 justify-end text-xs font-medium uppercase">
+                  118,267.5
+                </div>
+                <div className="text-success-success1 flex w-[140px] justify-end text-xs font-medium uppercase">
+                  +0.57%
+                </div>
+              </li>
               <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
                 <div className="flex w-[180px] items-center">
                   <img
@@ -170,6 +442,15 @@ export default function SelectCurrency() {
           </div>
         </div>
       </div>
+      <style jsx>{`
+        .hide-scrollbar {
+          -ms-overflow-style: none; /* برای IE و Edge */
+          scrollbar-width: none; /* برای فایرفاکس */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none; /* برای کروم، سافاری و سایر مرورگرهای Webkit */
+        }
+      `}</style>
     </div>
   );
 }

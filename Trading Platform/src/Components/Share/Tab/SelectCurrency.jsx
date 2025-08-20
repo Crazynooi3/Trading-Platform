@@ -6,7 +6,7 @@ export default function SelectCurrency() {
   const [activeSort, setActiveSort] = useState("None");
   return (
     <div className="absolute top-14 z-10 hidden cursor-auto transition-all group-hover:block before:absolute before:-top-14 before:h-[60px] before:w-[430px] before:content-[''] hover:block">
-      <div className="bg-base-base6 border-border-border1 h-[600px] min-h-[580px] w-[430px] rounded-lg border p-4">
+      <div className="bg-base-base6 border-border-border1 h-[615px] min-h-[580px] w-[430px] rounded-lg border p-4">
         {/* search box */}
         <div className="hover:border-gray-gray10 border-text-text4 h-8 w-full rounded-md border px-2 py-0.5">
           <input
@@ -148,7 +148,7 @@ export default function SelectCurrency() {
               />
             </div>
           </div>
-          <div className="hide-scrollbar h-[calc(100%-130px)] overflow-y-scroll">
+          <div className="custom-scrollbar h-[calc(100%-130px)] overflow-auto">
             <ul className="overflow-auto">
               <li className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[4px]">
                 <div className="flex w-[180px] items-center">
@@ -443,12 +443,18 @@ export default function SelectCurrency() {
         </div>
       </div>
       <style jsx>{`
-        .hide-scrollbar {
-          -ms-overflow-style: none; /* برای IE و Edge */
-          scrollbar-width: none; /* برای فایرفاکس */
+        .custom-scrollbar {
+          overflow-y: scroll;
+          scrollbar-color: transparent transparent;
+          box-sizing: content-box;
+          padding-right: 4px;
         }
-        .hide-scrollbar::-webkit-scrollbar {
-          display: none; /* برای کروم، سافاری و سایر مرورگرهای Webkit */
+        .custom-scrollbar:hover {
+          scrollbar-width: 4px;
+          scrollbar-color: gray transparent;
+        }
+        custom-scrollbar::-webkit-scrollbar-button {
+          display: none;
         }
       `}</style>
     </div>

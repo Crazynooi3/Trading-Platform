@@ -15,41 +15,41 @@ export default function OpenPosition() {
       <div>
         {/* Detials */}
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-text-text3 w-full text-xs">
+          <span className="text-text-text3 w-full text-xs font-medium">
             Liq. Price
             <br />
-            <span className="text-text-text0 text-sm">0.0</span>
+            <span className="text-text-text0 text-xs font-medium">0.0</span>
           </span>
-          <span className="text-text-text3 w-full text-end text-xs">
+          <span className="text-text-text3 w-full text-end text-xs font-medium">
             Liq. Price
             <br />
-            <span className="text-text-text0 text-sm">0.0</span>
+            <span className="text-text-text0 text-xs font-medium">0.0</span>
           </span>
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-text-text3 w-full text-xs">
+          <span className="text-text-text3 w-full text-xs font-medium">
             Margin(USDT)
             <br />
-            <span className="text-text-text0 text-sm">5.8</span>
+            <span className="text-text-text0 text-xs font-medium">5.8</span>
           </span>
-          <span className="text-text-text3 w-full text-end text-xs">
+          <span className="text-text-text3 w-full text-end text-xs font-medium">
             Margin(USDT)
             <br />
-            <span className="text-text-text0 text-sm">5.8</span>
+            <span className="text-text-text0 text-xs font-medium">5.8</span>
           </span>
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-text-text3 w-full text-xs">
+          <span className="text-text-text3 w-full text-xs font-medium">
             Max Long(BTC)
             <br />
-            <span className="text-text-text0 text-sm">0.001</span>
+            <span className="text-text-text0 text-xs font-medium">0.001</span>
           </span>
-          <span className="text-text-text3 w-full text-end text-xs">
+          <span className="text-text-text3 w-full text-end text-xs font-medium">
             Max Long(BTC)
             <br />
-            <span className="text-text-text0 text-sm">0.001</span>
+            <span className="text-text-text0 text-xs font-medium">0.001</span>
           </span>
         </div>
       </div>

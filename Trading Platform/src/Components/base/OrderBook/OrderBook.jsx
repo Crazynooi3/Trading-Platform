@@ -17,19 +17,27 @@ export default function OrderBook() {
             ref={sellListRef}
             className="hide-scrollbar flex h-full w-full flex-col-reverse justify-start overflow-y-scroll"
           >
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
+            <li className="relative flex h-5 w-full items-center justify-between px-4">
+              <span className="text-danger-danger1 w-full text-start text-xs font-medium">
                 First Sell Order
               </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
+              <span className="w-full py-0.5 text-end text-xs">69.54K</span>
+              <span className="w-full py-0.5 text-end text-xs">69.54K</span>
+              <span
+                className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)]"
+                style={{ width: "50%" }}
+              ></span>
             </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
+            <li className="relative flex h-5 w-full items-center justify-between px-4">
+              <span className="text-danger-danger1 w-full text-start text-xs font-medium">
                 2.2764
               </span>
               <span className="w-full text-end text-xs">69.54K</span>
               <span className="w-full text-end text-xs">69.54K</span>
+              <span
+                className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)]"
+                style={{ width: "60%" }}
+              ></span>
             </li>
             <li className="flex h-5 w-full items-center justify-between px-4">
               <span className="text-danger-danger1 w-full text-start text-xs">
@@ -209,19 +217,27 @@ export default function OrderBook() {
         {/* Buy part */}
         <div className="h-[calc(50%-1.25rem)]">
           <ul className="hide-scrollbar flex h-full w-full flex-col justify-start overflow-y-scroll">
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
+            <li className="relative flex h-5 w-full items-center justify-between px-4">
+              <span className="text-success-success1 w-full text-start text-xs font-medium">
                 First Buy Order
               </span>
               <span className="w-full text-end text-xs">69.54K</span>
               <span className="w-full text-end text-xs">69.54K</span>
+              <span
+                className="bg-success-success4 absolute right-0 -z-10 h-[calc(100%-2px)]"
+                style={{ width: "50%" }}
+              ></span>
             </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
+            <li className="relative flex h-5 w-full items-center justify-between px-4">
               <span className="text-success-success1 w-full text-start text-xs">
                 2.2764
               </span>
               <span className="w-full text-end text-xs">69.54K</span>
               <span className="w-full text-end text-xs">69.54K</span>
+              <span
+                className="bg-success-success4 absolute right-0 -z-10 h-[calc(100%-2px)]"
+                style={{ width: "55%" }}
+              ></span>
             </li>
             <li className="flex h-5 w-full items-center justify-between px-4">
               <span className="text-success-success1 w-full text-start text-xs">

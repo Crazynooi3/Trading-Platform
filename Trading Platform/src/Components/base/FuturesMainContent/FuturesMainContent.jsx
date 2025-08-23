@@ -11,6 +11,7 @@ import TPSL from "../Ordering/TPSL";
 import OpenPosition from "../OpenPosition/OpenPosition";
 import Chart from "../../Share/Chart/Chart";
 import SelectCurrency from "../../Share/Tab/SelectCurrency";
+import FuturesOrder from "../FuturesOrder/FuturesOrder";
 
 export default function FuturesMainContent() {
   const [isShowSelectCurency, setShowSelectCurency] = useState(false);
@@ -220,7 +221,7 @@ export default function FuturesMainContent() {
       </div>
 
       <div className="text-text-text0 border-border-border1 col-span-8 row-span-2 border-t">
-        4
+        <FuturesOrder />
       </div>
       <div className="text-text-text0 border-border-border1 col-span-2 row-span-2 border-t border-l">
         5

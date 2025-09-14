@@ -15,7 +15,7 @@ export default function OrderBook() {
         <div className="h-[calc(50%-1.25rem)]">
           <ul
             ref={sellListRef}
-            className="hide-scrollbar flex h-full w-full flex-col-reverse justify-start overflow-y-scroll"
+            className="hide-scrollbar flex h-full w-full flex-col-reverse justify-start overflow-y-scroll text-nowrap"
           >
             <li className="relative flex h-5 w-full items-center justify-between px-4">
               <span className="text-danger-danger1 w-full text-start text-xs font-medium">
@@ -216,7 +216,7 @@ export default function OrderBook() {
         </div>
         {/* Buy part */}
         <div className="h-[calc(50%-1.25rem)]">
-          <ul className="hide-scrollbar flex h-full w-full flex-col justify-start overflow-y-scroll">
+          <ul className="hide-scrollbar flex h-full w-full flex-col justify-start overflow-y-scroll text-nowrap">
             <li className="relative flex h-5 w-full items-center justify-between px-4">
               <span className="text-success-success1 w-full text-start text-xs font-medium">
                 First Buy Order

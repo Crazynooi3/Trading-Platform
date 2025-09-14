@@ -12,6 +12,7 @@ import OpenPosition from "../OpenPosition/OpenPosition";
 import Chart from "../../Share/Chart/Chart";
 import SelectCurrency from "../../Share/Tab/SelectCurrency";
 import FuturesOrder from "../FuturesOrder/FuturesOrder";
+import TrickSwiper from "../Swiper/TrickSwiper";
 
 export default function FuturesMainContent() {
   const [isShowSelectCurency, setShowSelectCurency] = useState(false);
@@ -26,7 +27,7 @@ export default function FuturesMainContent() {
         {/* Trick */}
         <div className="flex h-16 items-center pr-4 pl-2">
           {/* Left */}
-          <div className="flex items-center">
+          <div className="flex max-w-full items-center">
             <div className="relative flex items-center">
               <div className="group hover:bg-fill-fill4 mr-2 flex cursor-pointer items-center rounded-md px-2 py-1 transition-all">
                 {/* Modal Select Currency */}
@@ -73,8 +74,9 @@ export default function FuturesMainContent() {
                 3.0328
               </span>
             </div>
-            <div className="flex items-center overflow-x-auto pr-5 pl-10">
-              <div className="mr-4">
+            <div className="flex max-w-full items-center overflow-x-hidden text-nowrap">
+              <TrickSwiper />
+              {/* <div className="mr-4">
                 <span className="text-text-text4 mb-1 block cursor-help text-xs underline decoration-dashed underline-offset-4">
                   Market Price
                 </span>
@@ -196,7 +198,7 @@ export default function FuturesMainContent() {
                 <span className="text-text-text0 block text-xs font-medium">
                   957,656,850.6325
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
           {/* right */}

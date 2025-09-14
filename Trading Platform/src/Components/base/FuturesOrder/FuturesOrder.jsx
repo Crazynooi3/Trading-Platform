@@ -5,7 +5,7 @@ import TabsItems from "../../Share/Tab/TabsItems";
 export default function FuturesOrder() {
   return (
     <div>
-      <div className="flex flex-row">
+      <div className="flex flex-col">
         <div className="border-border-border1 flex w-full items-center justify-between border-b">
           <TabsItems
             tab1="Positions"
@@ -47,7 +47,113 @@ export default function FuturesOrder() {
             </div>
           </div>
         </div>
-        <div></div>
+        <div>
+          <div className="mx-4 text-xs">
+            <table class="w-full table-fixed appearance-none break-words break-all">
+              <thead className="h-10 text-nowrap">
+                <tr className="border-border-border1 table-row h-14 border-b font-normal">
+                  <th
+                    className="mb-[1px] w-[180px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Futures
+                  </th>
+                  <th
+                    className="mb-[1px] w-36 pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Size
+                  </th>
+                  <th
+                    className="mb-[1px] w-[188px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Unrealized PnL|% (L)
+                  </th>
+                  <th
+                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Entry Price
+                  </th>
+                  <th
+                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Breack Even Price
+                  </th>
+                  <th
+                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Mark Price
+                  </th>
+                  <th
+                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Liq. Price
+                  </th>
+                  <th
+                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Margin Ratio
+                  </th>
+                  <th
+                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Margin
+                  </th>
+                  <th
+                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    Position PnL
+                  </th>
+                  <th
+                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
+                    colSpan={1}
+                    rowSpan={1}
+                  >
+                    TP/SL
+                  </th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div></div>
+          </div>
+        </div>
       </div>
     </div>
   );

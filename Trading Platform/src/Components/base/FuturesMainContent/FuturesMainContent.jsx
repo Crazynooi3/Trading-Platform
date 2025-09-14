@@ -249,7 +249,7 @@ export default function FuturesMainContent() {
         <OpenPosition />
       </div>
 
-      <div className="text-text-text0 border-border-border1 col-span-8 row-span-2 border-t">
+      <div className="text-text-text0 border-border-border1 col-span-10 row-span-2 border-t">
         <FuturesOrder />
       </div>
       <div className="text-text-text0 border-border-border1 col-span-2 row-span-2 border-t border-l">

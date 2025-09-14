@@ -84,7 +84,7 @@ export default function OrderBookHeader() {
       <div className="text-text-text3 mt-2.5 text-xs">
         <ul className="flex w-full items-center">
           <li className="w-full px-4 text-start">Price(USDT)</li>
-          <li className="w-full px-4 text-end">Size(XRP)</li>
+          <li className="w-full py-0.5 text-end text-xs">Size(XRP)</li>
           <li className="w-full px-4 text-end">Sum(XRP)</li>
         </ul>
       </div>

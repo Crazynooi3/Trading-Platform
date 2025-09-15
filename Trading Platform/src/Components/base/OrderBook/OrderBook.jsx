@@ -1,13 +1,72 @@
-import React, { useEffect, useRef } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
 
 export default function OrderBook() {
+  // Fix scroll side in sell list
   const sellListRef = useRef(null);
-
   useEffect(() => {
     if (sellListRef.current) {
       sellListRef.current.scrollTop = sellListRef.current.scrollHeight;
     }
   }, []);
+
+  // WebSocket setup
+  const socketUrl =
+    "wss://stream.ompfinex.com/stream?origin=https://my.ompfinex.com";
+  const [messageHistory, setMessageHistory] = useState([]);
+  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
+    onOpen: () => {
+      console.log("WebSocket connection opened");
+      sendMessage(
+        JSON.stringify({
+          connect: {
+            name: "js",
+          },
+          id: 1,
+        }),
+      );
+    },
+    onClose: () => console.log("WebSocket connection closed"),
+    onError: (error) => console.error("WebSocket error:", error),
+  });
+
+  useEffect(() => {
+    setTimeout(() => {
+      sendMessage(
+        JSON.stringify({
+          subscribe: { channel: "public-market:r-price-ag" },
+          id: 2,
+        }),
+      );
+    }, 5000);
+  }, []);
+
+  // Log incoming WebSocket messages
+  useEffect(() => {
+    if (lastMessage !== null) {
+      try {
+        if (lastMessage.data === "{}") {
+          sendMessage("{}");
+        }
+        // Assuming the message is in JSON format
+        const messageData = JSON.parse(lastMessage.data);
+        console.log("Received WebSocket message:", messageData);
+        setMessageHistory((prev) => prev.concat(lastMessage));
+      } catch (error) {
+        console.error("Error parsing WebSocket message:", error);
+        console.log("Raw message:", lastMessage.data);
+      }
+    }
+  }, [lastMessage]);
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Open",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+  }[readyState];
+
   return (
     <>
       <div className="mt-1 h-[calc(100%-6.5rem)]">

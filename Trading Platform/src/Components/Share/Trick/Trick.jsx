@@ -40,7 +40,7 @@ export default function Trick() {
           <SelectCurrency />
 
           {/* top Detile */}
-          <div className="flex items-center">
+          <div className="flex h-16 items-center">
             <span className="text-xl font-medium">BTCUSDT</span>
             <span className="text-text-text3 ml-1 text-xs font-semibold">
               perpetual

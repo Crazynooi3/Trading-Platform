@@ -14,10 +14,11 @@ import SelectCurrency from "../../Share/Tab/SelectCurrency";
 import FuturesOrder from "../FuturesOrder/FuturesOrder";
 import TrickSwiper from "../Swiper/TrickSwiper";
 import Trick from "../../Share/Trick/Trick";
+import ShortLongTrigger from "../../Share/Chart/ShortLongTrigger";
 
 export default function FuturesMainContent() {
   return (
-    <div className="grid h-screen grid-flow-row grid-cols-12 grid-rows-8">
+    <div className="grid grid-flow-row grid-cols-12 grid-rows-8">
       <div className="col-span-8 row-span-6 text-white">
         {/* Trick */}
         <div className="flex h-16 items-center pr-4 pl-2">
@@ -29,10 +30,11 @@ export default function FuturesMainContent() {
 
         <Chart symbol={"BTCUSDT"} />
       </div>
-      <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
+      <div className="border-border-border1 col-span-2 row-span-6 border-l text-white xl:h-[650px]">
         <OrderBookTabs tab1="Order Book" tab2="Trades" />
         <OrderBookHeader />
         <OrderBook />
+        <ShortLongTrigger />
       </div>
       <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
         <ElTabs />

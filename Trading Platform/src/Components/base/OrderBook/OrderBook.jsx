@@ -14,6 +14,7 @@ export default function OrderBook() {
   const socketUrl =
     "wss://stream.ompfinex.com/stream?origin=https://my.ompfinex.com";
   const [messageHistory, setMessageHistory] = useState([]);
+  const [publicMarketPrice, setPublicMarketPrice] = useState({});
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: () => {
       console.log("WebSocket connection opened");
@@ -34,8 +35,12 @@ export default function OrderBook() {
     setTimeout(() => {
       sendMessage(
         JSON.stringify({
-          subscribe: { channel: "public-market:r-price-ag" },
-          id: 2,
+          subscribe: {
+            channel: "public-market:r-depth-9",
+            limit: 1,
+            reverse: true,
+          },
+          id: 9,
         }),
       );
     }, 5000);
@@ -50,7 +55,12 @@ export default function OrderBook() {
         }
         // Assuming the message is in JSON format
         const messageData = JSON.parse(lastMessage.data);
-        console.log("Received WebSocket message:", messageData);
+        // console.log("Received WebSocket message:", messageData);
+        if (messageData.push) {
+          let MarketPrice = messageData.push.pub.data.data;
+          setPublicMarketPrice(MarketPrice);
+          console.log(publicMarketPrice);
+        }
         setMessageHistory((prev) => prev.concat(lastMessage));
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
@@ -69,7 +79,7 @@ export default function OrderBook() {
 
   return (
     <>
-      <div className="mt-1 h-[calc(100%-6.5rem)]">
+      <div className="mt-1 h-[calc(100%-9.2rem)]">
         {/* Sell part */}
         <div className="h-[calc(50%-1.25rem)]">
           <ul

@@ -37,10 +37,8 @@ export default function OrderBook() {
         JSON.stringify({
           subscribe: {
             channel: "public-market:r-depth-9",
-            limit: 1,
-            reverse: true,
           },
-          id: 9,
+          id: 2,
         }),
       );
     }, 5000);

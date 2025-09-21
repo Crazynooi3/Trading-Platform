@@ -1,7 +1,14 @@
-import React, { useState, useCallback, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useMemo,
+} from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { GetMarketOrders } from "../../../Utilities/API/GetMarketOrders";
 
+const calculateTotalVolume = (price, volume) => (price / 10) * volume;
 export default function OrderBook() {
   // Stats
   const [marketOrders, setMarketOrders] = useState({});
@@ -17,7 +24,7 @@ export default function OrderBook() {
     if (sellListRef.current) {
       sellListRef.current.scrollTop = sellListRef.current.scrollHeight;
     }
-  }, []);
+  }, [askOrders]);
 
   // GetMarketOrder
   async function fetchOrders() {
@@ -31,6 +38,22 @@ export default function OrderBook() {
       console.error("Failed to fetch orders:", error);
     }
   }
+
+  const maxTotalVolumeAsk = useMemo(() => {
+    if (!askOrders || askOrders.length === 0) return 0;
+    const totals = askOrders.map((order) =>
+      calculateTotalVolume(order[0], order[1]),
+    );
+    return Math.max(...totals);
+  }, [askOrders]);
+
+  const maxTotalVolumeBid = useMemo(() => {
+    if (!bidOrders || bidOrders.length === 0) return 0;
+    const totals = bidOrders.map((order) =>
+      calculateTotalVolume(order[0], order[1]),
+    );
+    return Math.max(...totals);
+  }, [bidOrders]);
 
   // WebSocket setup
   const socketUrl =
@@ -107,213 +130,37 @@ export default function OrderBook() {
             ref={sellListRef}
             className="hide-scrollbar flex h-full w-full flex-col-reverse justify-start overflow-y-scroll text-nowrap"
           >
-            {askOrders.map((askOrder) => (
-              <li className="relative flex h-5 w-full items-center justify-between px-4">
-                <span className="text-danger-danger1 w-full text-start text-xs font-medium">
-                  {(askOrder[0] / 10).toLocaleString("en-US")}
-                </span>
-                <span className="w-full py-0.5 text-end text-xs">
-                  {(askOrder[1] * 1).toLocaleString("en-US")}
-                </span>
-                <span className="w-full py-0.5 text-end text-xs">
-                  {((askOrder[0] / 10) * askOrder[1]).toLocaleString("en-US")}
-                </span>
-                <span
-                  className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)]"
-                  style={{ width: "50%" }}
-                ></span>
-              </li>
-            ))}
-            <li className="relative flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs font-medium">
-                First Sell Order
-              </span>
-              <span className="w-full py-0.5 text-end text-xs">69.54K</span>
-              <span className="w-full py-0.5 text-end text-xs">69.54K</span>
-              <span
-                className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)]"
-                style={{ width: "50%" }}
-              ></span>
-            </li>
-            <li className="relative flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs font-medium">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span
-                className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)]"
-                style={{ width: "60%" }}
-              ></span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-danger-danger1 w-full text-start text-xs">
-                1.1764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
+            {askOrders.map((askOrder, index) => {
+              const totalVolume = calculateTotalVolume(
+                askOrder[0],
+                askOrder[1],
+              );
+              const percentage =
+                maxTotalVolumeAsk > 0
+                  ? (totalVolume / maxTotalVolumeAsk) * 100
+                  : 0;
+
+              return (
+                <li
+                  key={index}
+                  className="relative flex h-5 w-full items-center justify-between px-4"
+                >
+                  <span className="text-danger-danger1 w-full text-start text-xs font-medium">
+                    {(askOrder[0] / 10).toLocaleString("en-US")}
+                  </span>
+                  <span className="w-full py-0.5 text-end text-xs">
+                    {(askOrder[1] * 1).toLocaleString("en-US")}
+                  </span>
+                  <span className="w-full py-0.5 text-end text-xs">
+                    {totalVolume.toLocaleString("en-US")}
+                  </span>
+                  <span
+                    className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)]"
+                    style={{ width: `${percentage}%` }}
+                  ></span>
+                </li>
+              );
+            })}
           </ul>
         </div>
         {/* LastPrice */}
@@ -324,196 +171,37 @@ export default function OrderBook() {
         {/* Buy part */}
         <div className="h-[calc(50%-1.25rem)]">
           <ul className="hide-scrollbar flex h-full w-full flex-col justify-start overflow-y-scroll text-nowrap">
-            <li className="relative flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs font-medium">
-                First Buy Order
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span
-                className="bg-success-success4 absolute right-0 -z-10 h-[calc(100%-2px)]"
-                style={{ width: "50%" }}
-              ></span>
-            </li>
-            <li className="relative flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span
-                className="bg-success-success4 absolute right-0 -z-10 h-[calc(100%-2px)]"
-                style={{ width: "55%" }}
-              ></span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
-            <li className="flex h-5 w-full items-center justify-between px-4">
-              <span className="text-success-success1 w-full text-start text-xs">
-                2.2764
-              </span>
-              <span className="w-full text-end text-xs">69.54K</span>
-              <span className="w-full text-end text-xs">69.54K</span>
-            </li>
+            {bidOrders.map((bidOrder, index) => {
+              const totalVolume = calculateTotalVolume(
+                bidOrder[0],
+                bidOrder[1],
+              );
+              const percentage =
+                maxTotalVolumeBid > 0
+                  ? (totalVolume / maxTotalVolumeBid) * 100
+                  : 0;
+
+              return (
+                <li
+                  key={index}
+                  className="relative flex h-5 w-full items-center justify-between px-4"
+                >
+                  <span className="text-success-success1 w-full text-start text-xs font-medium">
+                    {(bidOrder[0] / 10).toLocaleString("en-US")}
+                  </span>
+                  <span className="w-full py-0.5 text-end text-xs">
+                    {(bidOrder[1] * 1).toLocaleString("en-US")}
+                  </span>
+                  <span className="w-full py-0.5 text-end text-xs">
+                    {totalVolume.toLocaleString("en-US")}
+                  </span>
+                  <span
+                    className="bg-success-success4 absolute right-0 -z-10 h-[calc(100%-2px)]"
+                    style={{ width: `${percentage}%` }}
+                  ></span>
+                </li>
+              );
+            })}
           </ul>
         </div>
         <style jsx>{`

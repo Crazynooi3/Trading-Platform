@@ -1,7 +1,16 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
+import { GetMarketOrders } from "../../../Utilities/API/GetMarketOrders";
 
 export default function OrderBook() {
+  // Stats
+  const [marketOrders, setMarketOrders] = useState({});
+  const [bidOrders, setBidOrders] = useState([]);
+  const [askOrders, setAskOrders] = useState([]);
+
+  // console.log(bidOrders);
+  // console.log(askOrders);
+
   // Fix scroll side in sell list
   const sellListRef = useRef(null);
   useEffect(() => {
@@ -9,6 +18,19 @@ export default function OrderBook() {
       sellListRef.current.scrollTop = sellListRef.current.scrollHeight;
     }
   }, []);
+
+  // GetMarketOrder
+  async function fetchOrders() {
+    try {
+      const url = "https://api.ompfinex.com/v1/market/9/depth?limit=200";
+      const orders = await GetMarketOrders(url);
+      setMarketOrders(orders);
+      setBidOrders(orders.data.bids);
+      setAskOrders(orders.data.asks);
+    } catch (error) {
+      console.error("Failed to fetch orders:", error);
+    }
+  }
 
   // WebSocket setup
   const socketUrl =
@@ -32,6 +54,7 @@ export default function OrderBook() {
   });
 
   useEffect(() => {
+    fetchOrders();
     setTimeout(() => {
       sendMessage(
         JSON.stringify({
@@ -84,6 +107,23 @@ export default function OrderBook() {
             ref={sellListRef}
             className="hide-scrollbar flex h-full w-full flex-col-reverse justify-start overflow-y-scroll text-nowrap"
           >
+            {askOrders.map((askOrder) => (
+              <li className="relative flex h-5 w-full items-center justify-between px-4">
+                <span className="text-danger-danger1 w-full text-start text-xs font-medium">
+                  {(askOrder[0] / 10).toLocaleString("en-US")}
+                </span>
+                <span className="w-full py-0.5 text-end text-xs">
+                  {(askOrder[1] * 1).toLocaleString("en-US")}
+                </span>
+                <span className="w-full py-0.5 text-end text-xs">
+                  {((askOrder[0] / 10) * askOrder[1]).toLocaleString("en-US")}
+                </span>
+                <span
+                  className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)]"
+                  style={{ width: "50%" }}
+                ></span>
+              </li>
+            ))}
             <li className="relative flex h-5 w-full items-center justify-between px-4">
               <span className="text-danger-danger1 w-full text-start text-xs font-medium">
                 First Sell Order

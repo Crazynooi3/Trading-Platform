@@ -8,15 +8,47 @@ import React, {
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { GetMarketOrders } from "../../../Utilities/API/GetMarketOrders";
 
+// فانکشن helper برای محاسبه حجم کل
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
+
+// فانکشن جدید برای تجمیع سفارش‌ها بر اساس step
+const aggregateOrders = (orders, step, isAsk = true) => {
+  if (step <= 1) return orders; // بدون تجمیع اگر step=1 یا کمتر
+
+  const aggregatedMap = new Map(); // برای جمع کردن حجم‌ها بر اساس قیمت رندشده
+
+  orders.forEach((order) => {
+    const originalPrice = order[0];
+    const volume = order[1];
+    // رند قیمت به پایین (floor) به مضرب step
+    const aggregatedPrice = Math.floor(originalPrice / step) * step;
+
+    if (aggregatedMap.has(aggregatedPrice)) {
+      const existing = aggregatedMap.get(aggregatedPrice);
+      aggregatedMap.set(aggregatedPrice, [
+        aggregatedPrice,
+        existing[1] + volume,
+      ]);
+    } else {
+      aggregatedMap.set(aggregatedPrice, [aggregatedPrice, volume]);
+    }
+  });
+
+  // تبدیل Map به آرایه و مرتب‌سازی
+  const aggregatedList = Array.from(aggregatedMap.values());
+  aggregatedList.sort((a, b) => (isAsk ? b[0] - a[0] : a[0] - b[0])); // برای asks descending, bids ascending
+
+  return aggregatedList;
+};
+
 export default function OrderBook() {
-  // Stats
+  // States
   const [marketOrders, setMarketOrders] = useState({});
   const [bidOrders, setBidOrders] = useState([]);
   const [askOrders, setAskOrders] = useState([]);
-
-  // console.log(bidOrders);
-  // console.log(askOrders);
+  const [aggregationStep, setAggregationStep] = useState(1);
+  const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
+  const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
 
   // Fix scroll side in sell list
   const sellListRef = useRef(null);
@@ -24,7 +56,7 @@ export default function OrderBook() {
     if (sellListRef.current) {
       sellListRef.current.scrollTop = sellListRef.current.scrollHeight;
     }
-  }, [askOrders]);
+  }, [askOrders, aggregationStep]);
 
   // GetMarketOrder
   async function fetchOrders() {
@@ -32,28 +64,12 @@ export default function OrderBook() {
       const url = "https://api.ompfinex.com/v1/market/9/depth?limit=200";
       const orders = await GetMarketOrders(url);
       setMarketOrders(orders);
-      setBidOrders(orders.data.bids);
-      setAskOrders(orders.data.asks);
+      setBidOrders(orders.data.bids.slice(0, 20));
+      setAskOrders(orders.data.asks.slice(0, 20));
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     }
   }
-
-  const maxTotalVolumeAsk = useMemo(() => {
-    if (!askOrders || askOrders.length === 0) return 0;
-    const totals = askOrders.map((order) =>
-      calculateTotalVolume(order[0], order[1]),
-    );
-    return Math.max(...totals);
-  }, [askOrders]);
-
-  const maxTotalVolumeBid = useMemo(() => {
-    if (!bidOrders || bidOrders.length === 0) return 0;
-    const totals = bidOrders.map((order) =>
-      calculateTotalVolume(order[0], order[1]),
-    );
-    return Math.max(...totals);
-  }, [bidOrders]);
 
   // WebSocket setup
   const socketUrl =
@@ -97,13 +113,11 @@ export default function OrderBook() {
         if (lastMessage.data === "{}") {
           sendMessage("{}");
         }
-        // Assuming the message is in JSON format
         const messageData = JSON.parse(lastMessage.data);
-        // console.log("Received WebSocket message:", messageData);
         if (messageData.push) {
           let MarketPrice = messageData.push.pub.data.data;
           setPublicMarketPrice(MarketPrice);
-          console.log(publicMarketPrice);
+          // console.log(publicMarketPrice);
         }
         setMessageHistory((prev) => prev.concat(lastMessage));
       } catch (error) {
@@ -112,6 +126,32 @@ export default function OrderBook() {
       }
     }
   }, [lastMessage]);
+
+  const askOrdersAggregated = useMemo(
+    () => aggregateOrders(askOrders, aggregationStep, true),
+    [askOrders, aggregationStep],
+  );
+  const bidOrdersAggregated = useMemo(
+    () => aggregateOrders(bidOrders, aggregationStep, false),
+    [bidOrders, aggregationStep],
+  );
+
+  // محاسبه حداکثر حجم کل برای لیست تجمیعی
+  const maxTotalVolumeAsk = useMemo(() => {
+    if (askOrdersAggregated.length === 0) return 0;
+    const totals = askOrdersAggregated.map((order) =>
+      calculateTotalVolume(order[0], order[1]),
+    );
+    return Math.max(...totals);
+  }, [askOrdersAggregated]);
+
+  const maxTotalVolumeBid = useMemo(() => {
+    if (bidOrdersAggregated.length === 0) return 0;
+    const totals = bidOrdersAggregated.map((order) =>
+      calculateTotalVolume(order[0], order[1]),
+    );
+    return Math.max(...totals);
+  }, [bidOrdersAggregated]);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",
@@ -127,10 +167,19 @@ export default function OrderBook() {
         {/* Sell part */}
         <div className="h-[calc(50%-1.25rem)]">
           <ul
+            onMouseLeave={() => setHoveredIndexAsk(null)}
             ref={sellListRef}
-            className="hide-scrollbar flex h-full w-full flex-col-reverse justify-start overflow-y-scroll text-nowrap"
+            className="hide-scrollbar relative flex h-full w-full flex-col-reverse justify-start overflow-y-scroll text-nowrap"
           >
-            {askOrders.map((askOrder, index) => {
+            {hoveredIndexAsk !== null && (
+              <span
+                className="bg-fill-fill1 absolute bottom-0 left-0 -z-20 w-full"
+                style={{
+                  height: `${(hoveredIndexAsk + 1) * 20}px`,
+                }}
+              ></span>
+            )}
+            {askOrdersAggregated.map((askOrder, index) => {
               const totalVolume = calculateTotalVolume(
                 askOrder[0],
                 askOrder[1],
@@ -143,7 +192,8 @@ export default function OrderBook() {
               return (
                 <li
                   key={index}
-                  className="relative flex h-5 w-full items-center justify-between px-4"
+                  className="border-fill-fill3 relative flex max-h-5 w-full cursor-pointer items-center justify-between border-dashed px-4 hover:border-t"
+                  onMouseEnter={() => setHoveredIndexAsk(index)}
                 >
                   <span className="text-danger-danger1 w-full text-start text-xs font-medium">
                     {(askOrder[0] / 10).toLocaleString("en-US")}
@@ -170,8 +220,19 @@ export default function OrderBook() {
         </div>
         {/* Buy part */}
         <div className="h-[calc(50%-1.25rem)]">
-          <ul className="hide-scrollbar flex h-full w-full flex-col justify-start overflow-y-scroll text-nowrap">
-            {bidOrders.map((bidOrder, index) => {
+          <ul
+            onMouseLeave={() => setHoveredIndexBid(null)}
+            className="hide-scrollbar relative flex h-full w-full flex-col justify-start overflow-y-scroll text-nowrap"
+          >
+            {hoveredIndexBid !== null && (
+              <span
+                className="bg-fill-fill1 absolute top-0 left-0 -z-20 w-full"
+                style={{
+                  height: `${(hoveredIndexBid + 1) * 20}px`,
+                }}
+              ></span>
+            )}
+            {bidOrdersAggregated.map((bidOrder, index) => {
               const totalVolume = calculateTotalVolume(
                 bidOrder[0],
                 bidOrder[1],
@@ -183,8 +244,9 @@ export default function OrderBook() {
 
               return (
                 <li
+                  onMouseEnter={() => setHoveredIndexBid(index)}
                   key={index}
-                  className="relative flex h-5 w-full items-center justify-between px-4"
+                  className="border-fill-fill3 relative flex max-h-5 w-full cursor-pointer items-center justify-between border-dashed px-4 hover:border-b"
                 >
                   <span className="text-success-success1 w-full text-start text-xs font-medium">
                     {(bidOrder[0] / 10).toLocaleString("en-US")}

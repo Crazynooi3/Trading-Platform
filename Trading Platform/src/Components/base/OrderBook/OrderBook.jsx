@@ -8,7 +8,7 @@ const calculateTotalVolume = (price, volume) => (price / 10) * volume;
 
 // فانکشن جدید برای تجمیع سفارش‌ها بر اساس step
 const aggregateOrders = (orders, step, isAsk = true) => {
-  if (step <= 1) return orders; // بدون تجمیع اگر step=1 یا کمتر
+  if (step <= 1) return orders.slice(0, 20); // بدون تجمیع اگر step=1 یا کمتر
 
   const aggregatedMap = new Map(); // برای جمع کردن حجم‌ها بر اساس قیمت رندشده
 
@@ -30,7 +30,7 @@ const aggregateOrders = (orders, step, isAsk = true) => {
   });
 
   // تبدیل Map به آرایه و مرتب‌سازی
-  const aggregatedList = Array.from(aggregatedMap.values());
+  const aggregatedList = Array.from(aggregatedMap.values()).slice(0, 20);
   aggregatedList.sort((a, b) => a[0] - b[0]);
   console.log(aggregatedList);
 
@@ -55,13 +55,13 @@ export default function OrderBook() {
   }, [askOrders, steper]);
 
   // GetMarketOrder
-  async function fetchOrders() {
+  async function fetchOrders(limit) {
     try {
-      const url = "https://api.ompfinex.com/v1/market/9/depth?limit=200";
+      const url = `https://api.ompfinex.com/v1/market/9/depth?limit=${limit}`;
       const orders = await GetMarketOrders(url);
       setMarketOrders(orders);
-      setBidOrders(orders.data.bids.slice(0, 20));
-      setAskOrders(orders.data.asks.slice(0, 20));
+      setBidOrders(orders.data.bids);
+      setAskOrders(orders.data.asks);
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     }
@@ -89,7 +89,7 @@ export default function OrderBook() {
   });
 
   useEffect(() => {
-    fetchOrders();
+    fetchOrders("200");
     setTimeout(() => {
       sendMessage(
         JSON.stringify({

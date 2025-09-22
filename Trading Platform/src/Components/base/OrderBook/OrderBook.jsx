@@ -1,12 +1,7 @@
-import React, {
-  useState,
-  useCallback,
-  useEffect,
-  useRef,
-  useMemo,
-} from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { GetMarketOrders } from "../../../Utilities/API/GetMarketOrders";
+import { useAggregation } from "../../../Utilities/Context/AggregationContext";
 
 // فانکشن helper برای محاسبه حجم کل
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
@@ -19,7 +14,7 @@ const aggregateOrders = (orders, step, isAsk = true) => {
 
   orders.forEach((order) => {
     const originalPrice = order[0];
-    const volume = order[1];
+    const volume = parseFloat(order[1]);
     // رند قیمت به پایین (floor) به مضرب step
     const aggregatedPrice = Math.floor(originalPrice / step) * step;
 
@@ -27,7 +22,7 @@ const aggregateOrders = (orders, step, isAsk = true) => {
       const existing = aggregatedMap.get(aggregatedPrice);
       aggregatedMap.set(aggregatedPrice, [
         aggregatedPrice,
-        existing[1] + volume,
+        parseFloat(existing[1] + volume).toFixed(2),
       ]);
     } else {
       aggregatedMap.set(aggregatedPrice, [aggregatedPrice, volume]);
@@ -36,7 +31,8 @@ const aggregateOrders = (orders, step, isAsk = true) => {
 
   // تبدیل Map به آرایه و مرتب‌سازی
   const aggregatedList = Array.from(aggregatedMap.values());
-  aggregatedList.sort((a, b) => (isAsk ? b[0] - a[0] : a[0] - b[0])); // برای asks descending, bids ascending
+  aggregatedList.sort((a, b) => a[0] - b[0]);
+  console.log(aggregatedList);
 
   return aggregatedList;
 };
@@ -46,7 +42,7 @@ export default function OrderBook() {
   const [marketOrders, setMarketOrders] = useState({});
   const [bidOrders, setBidOrders] = useState([]);
   const [askOrders, setAskOrders] = useState([]);
-  const [aggregationStep, setAggregationStep] = useState(1);
+  const { steper } = useAggregation();
   const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
 
@@ -56,7 +52,7 @@ export default function OrderBook() {
     if (sellListRef.current) {
       sellListRef.current.scrollTop = sellListRef.current.scrollHeight;
     }
-  }, [askOrders, aggregationStep]);
+  }, [askOrders, steper]);
 
   // GetMarketOrder
   async function fetchOrders() {
@@ -128,12 +124,12 @@ export default function OrderBook() {
   }, [lastMessage]);
 
   const askOrdersAggregated = useMemo(
-    () => aggregateOrders(askOrders, aggregationStep, true),
-    [askOrders, aggregationStep],
+    () => aggregateOrders(askOrders, steper, true),
+    [askOrders, steper],
   );
   const bidOrdersAggregated = useMemo(
-    () => aggregateOrders(bidOrders, aggregationStep, false),
-    [bidOrders, aggregationStep],
+    () => aggregateOrders(bidOrders, steper, false),
+    [bidOrders, steper],
   );
 
   // محاسبه حداکثر حجم کل برای لیست تجمیعی

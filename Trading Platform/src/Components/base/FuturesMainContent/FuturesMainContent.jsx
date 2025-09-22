@@ -15,43 +15,45 @@ import FuturesOrder from "../FuturesOrder/FuturesOrder";
 import TrickSwiper from "../Swiper/TrickSwiper";
 import Trick from "../../Share/Trick/Trick";
 import ShortLongTrigger from "../../Share/Chart/ShortLongTrigger";
-
+import { AggregationProvider } from "../../../Utilities/Context/AggregationContext";
 export default function FuturesMainContent() {
   return (
-    <div className="grid grid-flow-row grid-cols-12 grid-rows-8">
-      <div className="col-span-8 row-span-6 text-white">
-        {/* Trick */}
-        <div className="flex h-16 items-center pr-4 pl-2">
-          {/* Left */}
-          <Trick />
-          {/* right */}
-          <div></div>
+    <AggregationProvider>
+      <div className="grid grid-flow-row grid-cols-12 grid-rows-8">
+        <div className="col-span-8 row-span-6 text-white">
+          {/* Trick */}
+          <div className="flex h-16 items-center pr-4 pl-2">
+            {/* Left */}
+            <Trick />
+            {/* right */}
+            <div></div>
+          </div>
+
+          <Chart symbol={"BTCUSDT"} />
+        </div>
+        <div className="border-border-border1 col-span-2 row-span-6 border-l text-white xl:h-[650px]">
+          <OrderBookTabs tab1="Order Book" tab2="Trades" />
+          <OrderBookHeader />
+          <OrderBook />
+          <ShortLongTrigger />
+        </div>
+        <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
+          <ElTabs />
+          <FuturesMarginTabs />
+          <TabTextWrapper />
+          <OrderPlace />
+          <SpotSlider />
+          <TPSL />
+          <OpenPosition />
         </div>
 
-        <Chart symbol={"BTCUSDT"} />
+        <div className="text-text-text0 border-border-border1 col-span-10 row-span-2 border-t">
+          <FuturesOrder />
+        </div>
+        <div className="text-text-text0 border-border-border1 col-span-2 row-span-2 border-t border-l">
+          5
+        </div>
       </div>
-      <div className="border-border-border1 col-span-2 row-span-6 border-l text-white xl:h-[650px]">
-        <OrderBookTabs tab1="Order Book" tab2="Trades" />
-        <OrderBookHeader />
-        <OrderBook />
-        <ShortLongTrigger />
-      </div>
-      <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
-        <ElTabs />
-        <FuturesMarginTabs />
-        <TabTextWrapper />
-        <OrderPlace />
-        <SpotSlider />
-        <TPSL />
-        <OpenPosition />
-      </div>
-
-      <div className="text-text-text0 border-border-border1 col-span-10 row-span-2 border-t">
-        <FuturesOrder />
-      </div>
-      <div className="text-text-text0 border-border-border1 col-span-2 row-span-2 border-t border-l">
-        5
-      </div>
-    </div>
+    </AggregationProvider>
   );
 }

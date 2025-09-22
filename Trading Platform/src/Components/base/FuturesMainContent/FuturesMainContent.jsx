@@ -12,7 +12,7 @@ import OpenPosition from "../OpenPosition/OpenPosition";
 import Chart from "../../Share/Chart/Chart";
 import SelectCurrency from "../../Share/Tab/SelectCurrency";
 import FuturesOrder from "../FuturesOrder/FuturesOrder";
-import TrickSwiper from "../Swiper/TrickSwiper";
+import { VolumeProvider } from "../../../Utilities/API/VolumeContext";
 import Trick from "../../Share/Trick/Trick";
 import ShortLongTrigger from "../../Share/Chart/ShortLongTrigger";
 import { AggregationProvider } from "../../../Utilities/Context/AggregationContext";
@@ -31,12 +31,14 @@ export default function FuturesMainContent() {
 
           <Chart symbol={"BTCUSDT"} />
         </div>
-        <div className="border-border-border1 col-span-2 row-span-6 border-l text-white xl:h-[650px]">
-          <OrderBookTabs tab1="Order Book" tab2="Trades" />
-          <OrderBookHeader />
-          <OrderBook />
-          <ShortLongTrigger />
-        </div>
+        <VolumeProvider>
+          <div className="border-border-border1 col-span-2 row-span-6 border-l text-white xl:h-[650px]">
+            <OrderBookTabs tab1="Order Book" tab2="Trades" />
+            <OrderBookHeader />
+            <OrderBook />
+            <ShortLongTrigger />
+          </div>
+        </VolumeProvider>
         <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
           <ElTabs />
           <FuturesMarginTabs />

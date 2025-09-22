@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { GetMarketOrders } from "../../../Utilities/API/GetMarketOrders";
 import { useAggregation } from "../../../Utilities/Context/AggregationContext";
+import { useVolume } from "../../../Utilities/API/VolumeContext";
 
 // فانکشن helper برای محاسبه حجم کل
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
@@ -45,6 +46,7 @@ export default function OrderBook() {
   const { steper } = useAggregation();
   const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
+  const { setTotalVolumes } = useVolume();
 
   // Fix scroll side in sell list
   const sellListRef = useRef(null);
@@ -148,6 +150,22 @@ export default function OrderBook() {
     );
     return Math.max(...totals);
   }, [bidOrdersAggregated]);
+
+  const totalVolumeAsk = useMemo(() => {
+    return askOrdersAggregated
+      .reduce((sum, order) => sum + parseFloat(order[1]), 0)
+      .toFixed(2);
+  }, [askOrdersAggregated]);
+
+  const totalVolumeBid = useMemo(() => {
+    return bidOrdersAggregated
+      .reduce((sum, order) => sum + parseFloat(order[1]), 0)
+      .toFixed(2);
+  }, [bidOrdersAggregated]);
+
+  useEffect(() => {
+    setTotalVolumes({ ask: totalVolumeAsk, bid: totalVolumeBid });
+  }, [totalVolumeAsk, totalVolumeBid]);
 
   const connectionStatus = {
     [ReadyState.CONNECTING]: "Connecting",

@@ -326,7 +326,7 @@ export default function OrderBook() {
                     {totalVolume.toLocaleString("en-US")}
                   </span>
                   <span
-                    className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)]"
+                    className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)] transition-all duration-500"
                     style={{ width: `${percentage}%` }}
                   ></span>
                 </li>
@@ -379,7 +379,7 @@ export default function OrderBook() {
                     {totalVolume.toLocaleString("en-US")}
                   </span>
                   <span
-                    className="bg-success-success4 absolute right-0 -z-10 h-[calc(100%-2px)]"
+                    className="bg-success-success4 absolute right-0 -z-10 h-[calc(100%-2px)] transition-all duration-500"
                     style={{ width: `${percentage}%` }}
                   ></span>
                 </li>

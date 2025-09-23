@@ -2,11 +2,11 @@ import React from "react";
 import { useEffect, useState } from "react";
 import TrickSwiper from "../../base/Swiper/TrickSwiper";
 import SelectCurrency from "../../Share/Tab/SelectCurrency";
+import { MarketProvider } from "../../../Utilities/Context/MarketDataContext";
 
 export default function Trick() {
   const [isShowSelectCurency, setShowSelectCurency] = useState(false);
   const [isShowSwipers, setShowSwipers] = useState(false);
-  console.log(isShowSwipers);
 
   const isShowModalCurrency = () => {
     setShowSelectCurency != isShowSelectCurency;
@@ -37,7 +37,9 @@ export default function Trick() {
       <div className="relative flex items-center">
         <div className="group hover:bg-fill-fill4 mr-2 flex cursor-pointer items-center rounded-md px-2 py-1 transition-all">
           {/* Modal Select Currency */}
-          <SelectCurrency />
+          <MarketProvider token={""}>
+            <SelectCurrency />
+          </MarketProvider>
 
           {/* top Detile */}
           <div className="flex h-16 items-center">

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { GetMarketOrders } from "../../../Utilities/API/GetMarketOrders";
 import { useAggregation } from "../../../Utilities/Context/AggregationContext";
-import { useVolume } from "../../../Utilities/API/VolumeContext";
+import { useVolume } from "../../../Utilities/Context/VolumeContext";
 
 // فانکشن helper برای محاسبه حجم کل
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
@@ -39,7 +39,7 @@ const aggregateOrders = (orders, step, isAsk = true) => {
   //   "isAsk:",
   //   isAsk,
   // );
-  console.log("Input orders:", orders);
+  // console.log("Input orders:", orders);
 
   orders.forEach((order) => {
     const originalPriceRial = order[0];
@@ -84,7 +84,7 @@ const aggregateOrders = (orders, step, isAsk = true) => {
   aggregatedList = aggregatedList.slice(0, 20);
 
   // دیباگ: چاپ خروجی نهایی
-  console.log("Aggregated output (rial):", aggregatedList);
+  // console.log("Aggregated output (rial):", aggregatedList);
 
   return aggregatedList;
 };
@@ -127,7 +127,7 @@ export default function OrderBook() {
   const [lastMessageOrder, setLastMessageOrder] = useState();
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: () => {
-      console.log("WebSocket connection opened");
+      // console.log("WebSocket connection opened");
       sendMessage(
         JSON.stringify({
           connect: {
@@ -137,7 +137,7 @@ export default function OrderBook() {
         }),
       );
     },
-    onClose: () => console.log("WebSocket connection closed"),
+    // onClose: () => console.log("WebSocket connection closed"),
     onError: (error) => console.error("WebSocket error:", error),
   });
 
@@ -210,12 +210,12 @@ export default function OrderBook() {
         setMessageHistory((prev) => prev.concat(lastMessage));
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
-        console.log("Raw message:", lastMessage.data);
+        // console.log("Raw message:", lastMessage.data);
       }
     }
 
     if (lastMessageOrder) {
-      console.log(lastMessageOrder);
+      // console.log(lastMessageOrder);
       const data = lastMessageOrder.push?.pub?.data;
       if (data) {
         const aUpdates = data.a || []; // asks updates

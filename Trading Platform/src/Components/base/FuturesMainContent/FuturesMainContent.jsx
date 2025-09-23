@@ -12,7 +12,7 @@ import OpenPosition from "../OpenPosition/OpenPosition";
 import Chart from "../../Share/Chart/Chart";
 import SelectCurrency from "../../Share/Tab/SelectCurrency";
 import FuturesOrder from "../FuturesOrder/FuturesOrder";
-import { VolumeProvider } from "../../../Utilities/API/VolumeContext";
+import { VolumeProvider } from "../../../Utilities/Context/VolumeContext";
 import Trick from "../../Share/Trick/Trick";
 import ShortLongTrigger from "../../Share/Chart/ShortLongTrigger";
 import { AggregationProvider } from "../../../Utilities/Context/AggregationContext";

@@ -1,5 +1,5 @@
 import React from "react";
-import { useVolume } from "../../../Utilities/API/VolumeContext";
+import { useVolume } from "../../../Utilities/Context/VolumeContext";
 
 export default function ShortLongTrigger() {
   const { totalVolumes } = useVolume();

@@ -29,16 +29,16 @@ const aggregateOrders = (orders, step, isAsk = true) => {
   });
 
   // دیباگ: چاپ maxPrice و orders
-  console.log(
-    "maxPrice (rial):",
-    maxPriceRial,
-    "minPrice (rial):",
-    minPriceRial,
-    "step (toman):",
-    step,
-    "isAsk:",
-    isAsk,
-  );
+  // console.log(
+  //   "maxPrice (rial):",
+  //   maxPriceRial,
+  //   "minPrice (rial):",
+  //   minPriceRial,
+  //   "step (toman):",
+  //   step,
+  //   "isAsk:",
+  //   isAsk,
+  // );
   console.log("Input orders:", orders);
 
   orders.forEach((order) => {
@@ -121,10 +121,10 @@ export default function OrderBook() {
   }
 
   // WebSocket setup
-  const socketUrl =
-    "wss://stream.ompfinex.com/stream?origin=https://my.ompfinex.com";
+  const socketUrl = "wss://stream.ompfinex.com/stream";
   const [messageHistory, setMessageHistory] = useState([]);
   const [publicMarketPrice, setPublicMarketPrice] = useState({});
+  const [lastMessageOrder, setLastMessageOrder] = useState();
   const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
     onOpen: () => {
       console.log("WebSocket connection opened");
@@ -143,17 +143,54 @@ export default function OrderBook() {
 
   useEffect(() => {
     fetchOrders("2000");
-    setTimeout(() => {
-      sendMessage(
-        JSON.stringify({
-          subscribe: {
-            channel: "public-market:r-depth-9",
-          },
-          id: 2,
-        }),
-      );
-    }, 5000);
+    sendMessage(
+      JSON.stringify({
+        subscribe: {
+          channel: "public-market:r-depth-9",
+        },
+        id: 2,
+      }),
+    );
   }, []);
+
+  // Updater order with WebSocket
+  const updateOrderbook = (currentOrders, updates, isAsk = true) => {
+    // currentOrders: array of [price (string/number), volume (string)]
+    // updates: array of [price (string), volume (string)]
+    // تبدیل currentOrders به Map برای جستجوی سریع: price (number) => volume (number)
+    const orderMap = new Map();
+    currentOrders.forEach((order) => {
+      const price = parseFloat(order[0]);
+      const volume = parseFloat(order[1]);
+      if (!isNaN(price) && !isNaN(volume)) {
+        orderMap.set(price, volume);
+      }
+    });
+
+    // اعمال آپدیت‌ها
+    updates.forEach((update) => {
+      const price = parseFloat(update[0]);
+      const volume = parseFloat(update[1]);
+      if (!isNaN(price) && !isNaN(volume)) {
+        if (volume === 0) {
+          orderMap.delete(price); // حذف اگر حجم 0 باشه
+        } else {
+          orderMap.set(price, volume); // اضافه یا آپدیت
+        }
+      }
+    });
+
+    // تبدیل Map به آرایه مرتب‌شده
+    let sortedOrders = Array.from(orderMap.entries()).sort((a, b) => {
+      return isAsk ? a[0] - b[0] : b[0] - a[0]; // asks: ascending, bids: descending
+    });
+
+    // خروجی نهایی: [price (string), volume (string با toFixed(2))]
+    return sortedOrders.map(([price, volume]) => [
+      price.toString(),
+      volume.toFixed(2),
+    ]);
+  };
 
   // Log incoming WebSocket messages
   useEffect(() => {
@@ -161,6 +198,8 @@ export default function OrderBook() {
       try {
         if (lastMessage.data === "{}") {
           sendMessage("{}");
+        } else {
+          setLastMessageOrder(JSON.parse(lastMessage.data));
         }
         const messageData = JSON.parse(lastMessage.data);
         if (messageData.push) {
@@ -172,6 +211,23 @@ export default function OrderBook() {
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
         console.log("Raw message:", lastMessage.data);
+      }
+    }
+
+    if (lastMessageOrder) {
+      console.log(lastMessageOrder);
+      const data = lastMessageOrder.push?.pub?.data;
+      if (data) {
+        const aUpdates = data.a || []; // asks updates
+        const bUpdates = data.b || []; // bids updates
+
+        // آپدیت asks
+        const newAskOrders = updateOrderbook(askOrders, aUpdates, true);
+        setAskOrders(newAskOrders);
+
+        // آپدیت bids
+        const newBidOrders = updateOrderbook(bidOrders, bUpdates, false);
+        setBidOrders(newBidOrders);
       }
     }
   }, [lastMessage]);

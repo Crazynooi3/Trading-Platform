@@ -9,31 +9,82 @@ const calculateTotalVolume = (price, volume) => (price / 10) * volume;
 
 // فانکشن جدید برای تجمیع سفارش‌ها بر اساس step
 const aggregateOrders = (orders, step, isAsk = true) => {
-  if (step <= 1) return orders.slice(0, 20); // بدون تجمیع اگر step=1 یا کمتر
+  if (step <= 1) {
+    // سورت بر اساس isAsk، بدون تغییر قیمت
+    const sortedOrders = [...orders].sort((a, b) =>
+      isAsk ? a[0] - b[0] : b[0] - a[0],
+    );
+    return sortedOrders.slice(0, 20);
+  }
 
-  const aggregatedMap = new Map(); // برای جمع کردن حجم‌ها بر اساس قیمت رندشده
+  const aggregatedMap = new Map();
+
+  // پیدا کردن max/min قیمت (به ریال)
+  let maxPriceRial = -Infinity;
+  let minPriceRial = Infinity;
+  orders.forEach((order) => {
+    const price = order[0];
+    if (price > maxPriceRial) maxPriceRial = price;
+    if (price < minPriceRial) minPriceRial = price;
+  });
+
+  // دیباگ: چاپ maxPrice و orders
+  console.log(
+    "maxPrice (rial):",
+    maxPriceRial,
+    "minPrice (rial):",
+    minPriceRial,
+    "step (toman):",
+    step,
+    "isAsk:",
+    isAsk,
+  );
+  console.log("Input orders:", orders);
 
   orders.forEach((order) => {
-    const originalPrice = order[0];
+    const originalPriceRial = order[0];
     const volume = parseFloat(order[1]);
-    // رند قیمت به پایین (floor) به مضرب step
-    const aggregatedPrice = Math.floor(originalPrice / step) * step;
+    const originalPriceTomani = originalPriceRial / 10; // تبدیل به تومان
 
-    if (aggregatedMap.has(aggregatedPrice)) {
-      const existing = aggregatedMap.get(aggregatedPrice);
-      aggregatedMap.set(aggregatedPrice, [
-        aggregatedPrice,
-        parseFloat(existing[1] + volume).toFixed(2),
-      ]);
+    // منطق رندینگ روی تومان
+    let aggregatedPriceTomani;
+    if (isAsk) {
+      aggregatedPriceTomani = Math.ceil(originalPriceTomani / step) * step;
+      // محدود کردن به سرخط (روی تومان)
+      const maxAllowedTomani = Math.ceil(maxPriceRial / 10 / step) * step;
+      if (aggregatedPriceTomani > maxAllowedTomani) {
+        aggregatedPriceTomani = Math.floor(maxPriceRial / 10 / step) * step;
+      }
     } else {
-      aggregatedMap.set(aggregatedPrice, [aggregatedPrice, volume]);
+      aggregatedPriceTomani = Math.floor(originalPriceTomani / step) * step;
+      const minAllowedTomani = Math.floor(minPriceRial / 10 / step) * step;
+      if (aggregatedPriceTomani < minAllowedTomani) {
+        aggregatedPriceTomani = Math.ceil(minPriceRial / 10 / step) * step;
+      }
+    }
+
+    const aggregatedPriceRial = aggregatedPriceTomani * 10; // برگرد به ریال
+
+    if (aggregatedMap.has(aggregatedPriceRial)) {
+      const existingVolume = aggregatedMap.get(aggregatedPriceRial);
+      aggregatedMap.set(aggregatedPriceRial, existingVolume + volume);
+    } else {
+      aggregatedMap.set(aggregatedPriceRial, volume);
     }
   });
 
-  // تبدیل Map به آرایه و مرتب‌سازی
-  const aggregatedList = Array.from(aggregatedMap.values()).slice(0, 20);
-  aggregatedList.sort((a, b) => a[0] - b[0]);
-  console.log(aggregatedList);
+  let aggregatedList = Array.from(aggregatedMap.entries()).map(
+    ([price, volume]) => [price, volume.toFixed(2)],
+  );
+
+  // سورتینگ بر اساس isAsk
+  aggregatedList.sort((a, b) => (isAsk ? a[0] - b[0] : b[0] - a[0]));
+
+  // حداکثر 20 آیتم
+  aggregatedList = aggregatedList.slice(0, 20);
+
+  // دیباگ: چاپ خروجی نهایی
+  console.log("Aggregated output (rial):", aggregatedList);
 
   return aggregatedList;
 };
@@ -91,7 +142,7 @@ export default function OrderBook() {
   });
 
   useEffect(() => {
-    fetchOrders("200");
+    fetchOrders("2000");
     setTimeout(() => {
       sendMessage(
         JSON.stringify({

@@ -135,7 +135,7 @@ export default function OrderBook() {
     onError: (error) => console.error("WebSocket error:", error),
   });
 
-  // WebSocket
+  // WebSocket Begining MSG
   useEffect(() => {
     sendMessage(
       JSON.stringify({

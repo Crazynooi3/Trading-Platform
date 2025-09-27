@@ -2,16 +2,16 @@ import React from "react";
 import { useEffect, useState } from "react";
 import TrickSwiper from "../../base/Swiper/TrickSwiper";
 import SelectCurrency from "../../Share/Tab/SelectCurrency";
-import {
-  MarketProvider,
-  useMarket,
-} from "../../../Utilities/Context/MarketDataContext";
+// import {
+//   MarketProvider,
+//   useMarket,
+// } from "../../../Utilities/Context/MarketDataContext";
 
 export default function Trick() {
   const [isShowSelectCurency, setShowSelectCurency] = useState(false);
   const [isShowSwipers, setShowSwipers] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState(9);
-  const { totalMarkets } = useMarket();
+  // const { totalMarkets } = useMarket();
 
   const isShowModalCurrency = () => {
     setShowSelectCurency != isShowSelectCurency;
@@ -25,14 +25,8 @@ export default function Trick() {
     const handleResize = () => {
       setShowSwipers(getScrren());
     };
-
-    // تنظیم جهت اولیه
     setShowSwipers(getScrren());
-
-    // افزودن Event Listener برای resize
     window.addEventListener("resize", handleResize);
-
-    // تمیز کردن Event Listener
     return () => {
       window.removeEventListener("resize", handleResize);
     };
@@ -43,7 +37,7 @@ export default function Trick() {
   };
 
   const findMarketFromID = (id) => {
-    console.log(totalMarkets.data);
+    // console.log(totalMarkets.data);
   };
   findMarketFromID("1");
   return (
@@ -51,9 +45,7 @@ export default function Trick() {
       <div className="relative flex items-center">
         <div className="group hover:bg-fill-fill4 mr-2 flex h-10 cursor-pointer items-center rounded-md px-2 py-1 transition-all">
           {/* Modal Select Currency */}
-          <MarketProvider token={""}>
-            <SelectCurrency selectCurrencyFunc={selectCurrencyFunc} />
-          </MarketProvider>
+          <SelectCurrency selectCurrencyFunc={selectCurrencyFunc} />
 
           {/* top Detile */}
           <div className="flex h-16 items-center">

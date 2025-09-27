@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import OrderBookTabs from "./OrderBookTabs";
-import { useMarket } from "../../../Utilities/Context/MarketDataContext";
+import { useMarkets } from "../../../Utilities/Hooks/useMarket";
 
 export default function SelectCurrency(props) {
   const [activeTab, setActiveTab] = useState("All");
   const [activeSort, setActiveSort] = useState("None");
-  const { totalMarkets, fetchMarket, isLoding, error } = useMarket();
-  useEffect(() => {
-    console.log(totalMarkets);
-  }, [totalMarkets]);
+  const { data: allMarketData, isLoading, error } = useMarkets();
 
   const convertCurrencyCode = (currency) => {
     return currency === "IRR" ? "IRT" : currency;
@@ -180,7 +177,7 @@ export default function SelectCurrency(props) {
           </div>
           <div className="custom-scrollbar h-[calc(100%-130px)] overflow-auto">
             <ul className="overflow-auto">
-              {totalMarkets?.data?.map((currency) => {
+              {allMarketData?.map((currency) => {
                 let base_currency = currency.base_currency.id;
                 let quote_currency = convertCurrencyCode(
                   currency.quote_currency.id,

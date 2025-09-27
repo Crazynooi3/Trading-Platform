@@ -3,6 +3,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import { GetMarketOrders } from "../../../Utilities/API/GetMarketOrders";
 import { useAggregation } from "../../../Utilities/Context/AggregationContext";
 import { useVolume } from "../../../Utilities/Context/VolumeContext";
+import { useOrderBook } from "../../../Utilities/Hooks/useOrderBook";
 
 // فانکشن helper برای محاسبه حجم کل
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
@@ -27,19 +28,6 @@ const aggregateOrders = (orders, step, isAsk = true) => {
     if (price > maxPriceRial) maxPriceRial = price;
     if (price < minPriceRial) minPriceRial = price;
   });
-
-  // دیباگ: چاپ maxPrice و orders
-  // console.log(
-  //   "maxPrice (rial):",
-  //   maxPriceRial,
-  //   "minPrice (rial):",
-  //   minPriceRial,
-  //   "step (toman):",
-  //   step,
-  //   "isAsk:",
-  //   isAsk,
-  // );
-  // console.log("Input orders:", orders);
 
   orders.forEach((order) => {
     const originalPriceRial = order[0];
@@ -91,13 +79,19 @@ const aggregateOrders = (orders, step, isAsk = true) => {
 
 export default function OrderBook() {
   // States
-  const [marketOrders, setMarketOrders] = useState({});
   const [bidOrders, setBidOrders] = useState([]);
   const [askOrders, setAskOrders] = useState([]);
   const { steper } = useAggregation();
   const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
   const { setTotalVolumes } = useVolume();
+  const { data: orderBookData, isLoading, error } = useOrderBook("9", "2000");
+
+  useEffect(() => {
+    console.log(orderBookData);
+    setAskOrders(orderBookData?.asks);
+    setBidOrders(orderBookData?.bids);
+  }, [orderBookData]);
 
   // Fix scroll side in sell list
   const sellListRef = useRef(null);
@@ -108,17 +102,17 @@ export default function OrderBook() {
   }, [askOrders, steper]);
 
   // GetMarketOrder
-  async function fetchOrders(limit) {
-    try {
-      const url = `https://api.ompfinex.com/v1/market/9/depth?limit=${limit}`;
-      const orders = await GetMarketOrders(url);
-      setMarketOrders(orders);
-      setBidOrders(orders.data.bids);
-      setAskOrders(orders.data.asks);
-    } catch (error) {
-      console.error("Failed to fetch orders:", error);
-    }
-  }
+  // async function fetchOrders(limit) {
+  //   try {
+  //     const url = `https://api.ompfinex.com/v1/market/9/depth?limit=${limit}`;
+  //     const orders = await GetMarketOrders(url);
+  //     setMarketOrders(orders);
+  //     setBidOrders(orders.data.bids);
+  //     setAskOrders(orders.data.asks);
+  //   } catch (error) {
+  //     console.error("Failed to fetch orders:", error);
+  //   }
+  // }
 
   // WebSocket setup
   const socketUrl = "wss://stream.ompfinex.com/stream";
@@ -141,8 +135,8 @@ export default function OrderBook() {
     onError: (error) => console.error("WebSocket error:", error),
   });
 
+  // WebSocket
   useEffect(() => {
-    fetchOrders("2000");
     sendMessage(
       JSON.stringify({
         subscribe: {
@@ -232,18 +226,19 @@ export default function OrderBook() {
     }
   }, [lastMessage]);
 
-  const askOrdersAggregated = useMemo(
-    () => aggregateOrders(askOrders, steper, true),
-    [askOrders, steper],
-  );
-  const bidOrdersAggregated = useMemo(
-    () => aggregateOrders(bidOrders, steper, false),
-    [bidOrders, steper],
-  );
+  const askOrdersAggregated = useMemo(() => {
+    if (!askOrders || askOrders.length === 0) return [];
+    return aggregateOrders(askOrders, steper, true);
+  }, [askOrders, steper]);
+
+  const bidOrdersAggregated = useMemo(() => {
+    if (!bidOrders || bidOrders.length === 0) return [];
+    return aggregateOrders(bidOrders, steper, false);
+  }, [bidOrders, steper]);
 
   // محاسبه حداکثر حجم کل برای لیست تجمیعی
   const maxTotalVolumeAsk = useMemo(() => {
-    if (askOrdersAggregated.length === 0) return 0;
+    if (askOrdersAggregated?.length === 0) return 0;
     const totals = askOrdersAggregated.map((order) =>
       calculateTotalVolume(order[0], order[1]),
     );
@@ -274,13 +269,13 @@ export default function OrderBook() {
     setTotalVolumes({ ask: totalVolumeAsk, bid: totalVolumeBid });
   }, [totalVolumeAsk, totalVolumeBid]);
 
-  const connectionStatus = {
-    [ReadyState.CONNECTING]: "Connecting",
-    [ReadyState.OPEN]: "Open",
-    [ReadyState.CLOSING]: "Closing",
-    [ReadyState.CLOSED]: "Closed",
-    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
-  }[readyState];
+  // const connectionStatus = {
+  //   [ReadyState.CONNECTING]: "Connecting",
+  //   [ReadyState.OPEN]: "Open",
+  //   [ReadyState.CLOSING]: "Closing",
+  //   [ReadyState.CLOSED]: "Closed",
+  //   [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+  // }[readyState];
 
   return (
     <>

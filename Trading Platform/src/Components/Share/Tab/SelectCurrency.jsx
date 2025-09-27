@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import OrderBookTabs from "./OrderBookTabs";
 import { useMarket } from "../../../Utilities/Context/MarketDataContext";
 
-export default function SelectCurrency() {
+export default function SelectCurrency(props) {
   const [activeTab, setActiveTab] = useState("All");
   const [activeSort, setActiveSort] = useState("None");
   const { totalMarkets, fetchMarket, isLoding, error } = useMarket();
@@ -30,6 +30,10 @@ export default function SelectCurrency() {
     }
   };
 
+  const onClickHandler = (e) => {
+    props.selectCurrencyFunc(e);
+  };
+
   return (
     <div className="absolute top-14 z-10 hidden cursor-auto transition-all group-hover:block before:absolute before:-top-14 before:h-[60px] before:w-[430px] before:content-[''] hover:block">
       <div className="bg-base-base6 border-border-border1 h-[615px] min-h-[580px] w-[430px] rounded-lg border p-4">
@@ -46,8 +50,8 @@ export default function SelectCurrency() {
         <div>
           <OrderBookTabs
             tab1="Favorites"
-            tab2="USDT-M Futures"
-            tab3="USDC Futures"
+            tab2="Margin Trade"
+            tab3="Spot Trade"
           />
         </div>
         <div className="my-2 flex h-9 w-full">
@@ -186,6 +190,7 @@ export default function SelectCurrency() {
                   <li
                     key={currency.id}
                     className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[6px] px-2 text-nowrap"
+                    onClick={() => onClickHandler(currency.id)}
                   >
                     <span className="flex w-[180px] items-center">
                       <img

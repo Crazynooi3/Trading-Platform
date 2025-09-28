@@ -1,11 +1,21 @@
 import { useEffect, useState } from "react";
 import OrderBookTabs from "./OrderBookTabs";
 import { useMarkets } from "../../../Utilities/Hooks/useMarket";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function SelectCurrency(props) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("All");
   const [activeSort, setActiveSort] = useState("None");
   const { data: allMarketData, isLoading, error } = useMarkets();
+
+  // path maneger
+  useEffect(() => {
+    if (location.pathname === "/trade") {
+      navigate("/trade/USDT/IRT");
+    }
+  }, [navigate]);
 
   const convertCurrencyCode = (currency) => {
     return currency === "IRR" ? "IRT" : currency;
@@ -27,8 +37,8 @@ export default function SelectCurrency(props) {
     }
   };
 
-  const onClickHandler = (e) => {
-    props.selectCurrencyFunc(e);
+  const onClickHandler = (CoinID) => {
+    props.selectCurrencyFunc(CoinID);
   };
 
   return (
@@ -184,33 +194,35 @@ export default function SelectCurrency(props) {
                 );
                 let symbol = base_currency + " / " + quote_currency;
                 return (
-                  <li
-                    key={currency.id}
-                    className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[6px] px-2 text-nowrap"
-                    onClick={() => onClickHandler(currency.id)}
-                  >
-                    <span className="flex w-[180px] items-center">
-                      <img
-                        src="./../../../public/Star-nofill.png"
-                        alt="Star no fill"
-                        className="mr-1 h-4 w-4 cursor-pointer"
-                      />
-                      <span className="min-w-[160px] text-sm font-medium uppercase">
-                        {symbol}
-                      </span>
-                    </span>
-                    <span className="flex w-full flex-1 justify-end text-end text-xs font-medium text-nowrap uppercase">
-                      {formatPrice(
-                        currency.last_price,
-                        currency.quote_currency_precision,
-                      )}
-                    </span>
-                    <span
-                      className={` ${currency.day_change_percent > 0 ? "text-success-success1" : "text-danger-danger1"} flex max-w-[100px] min-w-[100px] justify-end text-xs font-medium uppercase`}
+                  <Link to={`/trade/${base_currency}/${quote_currency}`}>
+                    <li
+                      key={currency.id}
+                      className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[6px] px-2 text-nowrap"
+                      onClick={() => onClickHandler(currency.id)}
                     >
-                      {currency.day_change_percent + "%"}
-                    </span>
-                  </li>
+                      <span className="flex w-[180px] items-center">
+                        <img
+                          src="./../../../public/Star-nofill.png"
+                          alt="Star no fill"
+                          className="mr-1 h-4 w-4 cursor-pointer"
+                        />
+                        <span className="min-w-[160px] text-sm font-medium uppercase">
+                          {symbol}
+                        </span>
+                      </span>
+                      <span className="flex w-full flex-1 justify-end text-end text-xs font-medium text-nowrap uppercase">
+                        {formatPrice(
+                          currency.last_price,
+                          currency.quote_currency_precision,
+                        )}
+                      </span>
+                      <span
+                        className={` ${currency.day_change_percent > 0 ? "text-success-success1" : "text-danger-danger1"} flex max-w-[100px] min-w-[100px] justify-end text-xs font-medium uppercase`}
+                      >
+                        {currency.day_change_percent + "%"}
+                      </span>
+                    </li>
+                  </Link>
                 );
               })}
             </ul>

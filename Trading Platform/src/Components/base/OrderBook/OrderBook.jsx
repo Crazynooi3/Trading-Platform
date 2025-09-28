@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
-import { GetMarketOrders } from "../../../Utilities/API/GetMarketOrders";
 import { useAggregation } from "../../../Utilities/Context/AggregationContext";
 import { useVolume } from "../../../Utilities/Context/VolumeContext";
 import { useOrderBook } from "../../../Utilities/Hooks/useOrderBook";
+import { useWebSocketData } from "../../../Utilities/Context/WebSocketProvider";
 
 // فانکشن helper برای محاسبه حجم کل
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
@@ -88,7 +88,6 @@ export default function OrderBook() {
   const { data: orderBookData, isLoading, error } = useOrderBook("9", "2000");
 
   useEffect(() => {
-    console.log(orderBookData);
     setAskOrders(orderBookData?.asks);
     setBidOrders(orderBookData?.bids);
   }, [orderBookData]);
@@ -99,59 +98,16 @@ export default function OrderBook() {
     if (sellListRef.current) {
       sellListRef.current.scrollTop = sellListRef.current.scrollHeight;
     }
-  }, [askOrders, steper]);
-
-  // GetMarketOrder
-  // async function fetchOrders(limit) {
-  //   try {
-  //     const url = `https://api.ompfinex.com/v1/market/9/depth?limit=${limit}`;
-  //     const orders = await GetMarketOrders(url);
-  //     setMarketOrders(orders);
-  //     setBidOrders(orders.data.bids);
-  //     setAskOrders(orders.data.asks);
-  //   } catch (error) {
-  //     console.error("Failed to fetch orders:", error);
-  //   }
-  // }
+  }, [steper]);
 
   // WebSocket setup
-  const socketUrl = "wss://stream.ompfinex.com/stream";
-  const [messageHistory, setMessageHistory] = useState([]);
-  const [publicMarketPrice, setPublicMarketPrice] = useState({});
-  const [lastMessageOrder, setLastMessageOrder] = useState();
-  const { sendMessage, lastMessage, readyState } = useWebSocket(socketUrl, {
-    onOpen: () => {
-      // console.log("WebSocket connection opened");
-      sendMessage(
-        JSON.stringify({
-          connect: {
-            name: "js",
-          },
-          id: 1,
-        }),
-      );
-    },
-    // onClose: () => console.log("WebSocket connection closed"),
-    onError: (error) => console.error("WebSocket error:", error),
-  });
-
-  // WebSocket Begining MSG
-  useEffect(() => {
-    sendMessage(
-      JSON.stringify({
-        subscribe: {
-          channel: "public-market:r-depth-9",
-        },
-        id: 2,
-      }),
-    );
-  }, []);
+  const { lastMessage } = useWebSocketData();
+  const [aUpdate, setAUpdate] = useState([]);
+  const [bUpdate, setBUpdate] = useState([]);
+  const [marketChangePrice, setMarketChangePrice] = useState(null);
 
   // Updater order with WebSocket
   const updateOrderbook = (currentOrders, updates, isAsk = true) => {
-    // currentOrders: array of [price (string/number), volume (string)]
-    // updates: array of [price (string), volume (string)]
-    // تبدیل currentOrders به Map برای جستجوی سریع: price (number) => volume (number)
     const orderMap = new Map();
     currentOrders.forEach((order) => {
       const price = parseFloat(order[0]);
@@ -161,7 +117,6 @@ export default function OrderBook() {
       }
     });
 
-    // اعمال آپدیت‌ها
     updates.forEach((update) => {
       const price = parseFloat(update[0]);
       const volume = parseFloat(update[1]);
@@ -188,42 +143,23 @@ export default function OrderBook() {
 
   // Log incoming WebSocket messages
   useEffect(() => {
-    if (lastMessage !== null) {
+    if (lastMessage?.data) {
       try {
-        if (lastMessage.data === "{}") {
-          sendMessage("{}");
-        } else {
-          setLastMessageOrder(JSON.parse(lastMessage.data));
-        }
         const messageData = JSON.parse(lastMessage.data);
-        if (messageData.push) {
-          let MarketPrice = messageData.push.pub.data.data;
-          setPublicMarketPrice(MarketPrice);
-          // console.log(publicMarketPrice);
+        if (Object.keys(messageData).length > 0 && messageData.push) {
+          setAUpdate(messageData.push.pub.data.a);
+          setBUpdate(messageData.push.pub.data.b);
         }
-        setMessageHistory((prev) => prev.concat(lastMessage));
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
-        // console.log("Raw message:", lastMessage.data);
       }
     }
-
-    if (lastMessageOrder) {
-      // console.log(lastMessageOrder);
-      const data = lastMessageOrder.push?.pub?.data;
-      if (data) {
-        const aUpdates = data.a || []; // asks updates
-        const bUpdates = data.b || []; // bids updates
-
-        // آپدیت asks
-        const newAskOrders = updateOrderbook(askOrders, aUpdates, true);
-        setAskOrders(newAskOrders);
-
-        // آپدیت bids
-        const newBidOrders = updateOrderbook(bidOrders, bUpdates, false);
-        setBidOrders(newBidOrders);
-      }
-    }
+    // آپدیت asks
+    const newAskOrders = updateOrderbook(askOrders, aUpdate, true);
+    setAskOrders(newAskOrders);
+    // آپدیت bids
+    const newBidOrders = updateOrderbook(bidOrders, bUpdate, false);
+    setBidOrders(newBidOrders);
   }, [lastMessage]);
 
   const askOrdersAggregated = useMemo(() => {
@@ -268,14 +204,6 @@ export default function OrderBook() {
   useEffect(() => {
     setTotalVolumes({ ask: totalVolumeAsk, bid: totalVolumeBid });
   }, [totalVolumeAsk, totalVolumeBid]);
-
-  // const connectionStatus = {
-  //   [ReadyState.CONNECTING]: "Connecting",
-  //   [ReadyState.OPEN]: "Open",
-  //   [ReadyState.CLOSING]: "Closing",
-  //   [ReadyState.CLOSED]: "Closed",
-  //   [ReadyState.UNINSTANTIATED]: "Uninstantiated",
-  // }[readyState];
 
   return (
     <>

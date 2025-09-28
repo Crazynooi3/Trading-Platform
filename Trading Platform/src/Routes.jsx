@@ -1,5 +1,5 @@
 import Index from "./Pages/Index";
-import Trading from "./Pages/Trading";
+import Trade from "./Pages/Trade";
 
 const routes = [
   {
@@ -8,7 +8,11 @@ const routes = [
   },
   {
     path: "/trade",
-    element: <Trading />,
+    element: <Trade />,
+  },
+  {
+    path: "/trade/:base/:quote",
+    element: <Trade />,
   },
 ];
 

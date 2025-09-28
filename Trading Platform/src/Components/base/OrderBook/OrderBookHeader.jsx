@@ -1,7 +1,11 @@
 import React from "react";
 import SteperOrderbook from "./SteperOrderbook";
+import { useLocation, useParams } from "react-router-dom";
 
 export default function OrderBookHeader() {
+  const location = useLocation().pathname;
+  const { base, quote } = useParams();
+
   return (
     <>
       <div className="flex items-center px-4 pt-2.5 pb-2">
@@ -73,9 +77,9 @@ export default function OrderBookHeader() {
 
       <div className="text-text-text3 mt-2.5 text-xs">
         <ul className="flex w-full items-center">
-          <li className="w-full px-4 text-start">Price(USDT)</li>
-          <li className="w-full py-0.5 text-end text-xs">Size(XRP)</li>
-          <li className="w-full px-4 text-end">Sum(XRP)</li>
+          <li className="w-full px-4 text-start">Price ({quote})</li>
+          <li className="w-full py-0.5 text-end text-xs">Size ({base})</li>
+          <li className="w-full px-4 text-end">Sum ({base})</li>
         </ul>
       </div>
     </>

@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect, useState } from "react";
 import TrickSwiper from "../../base/Swiper/TrickSwiper";
 import SelectCurrency from "../../Share/Tab/SelectCurrency";
+import { useParams } from "react-router-dom";
 // import {
 //   MarketProvider,
 //   useMarket,
@@ -11,6 +12,8 @@ export default function Trick() {
   const [isShowSelectCurency, setShowSelectCurency] = useState(false);
   const [isShowSwipers, setShowSwipers] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState(9);
+  const { base, quote } = useParams();
+
   // const { totalMarkets } = useMarket();
 
   const isShowModalCurrency = () => {
@@ -49,7 +52,7 @@ export default function Trick() {
 
           {/* top Detile */}
           <div className="flex h-16 items-center">
-            <span className="text-xl font-medium">BTCUSDT</span>
+            <span className="text-xl font-medium">{base + quote}</span>
             <span className="text-text-text3 ml-1 text-xs font-semibold">
               perpetual
             </span>

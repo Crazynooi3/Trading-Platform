@@ -6,5 +6,6 @@ export function useMarkets() {
     queryKey: ["markets"],
     queryFn: fetchMarkets,
     staleTime: 60_000,
+    enabled: true,
   });
 }

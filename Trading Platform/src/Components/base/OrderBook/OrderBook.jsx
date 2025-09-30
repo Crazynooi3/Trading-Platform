@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import useWebSocket, { ReadyState } from "react-use-websocket";
 import { useAggregation } from "../../../Utilities/Context/AggregationContext";
 import { useVolume } from "../../../Utilities/Context/VolumeContext";
 import { useOrderBook } from "../../../Utilities/Hooks/useOrderBook";
-import { useWebSocketData } from "../../../Utilities/Context/WebSocketProvider";
+// import { useWebSocketData } from "../../../Utilities/Context/WebSocketProvider";
+import { useMarkets } from "../../../Utilities/Hooks/useMarket";
+import { useParams } from "react-router-dom";
+import useInitialWebSocket from "../../../Utilities/Hooks/useWebSocket";
 
 // فانکشن helper برای محاسبه حجم کل
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
@@ -85,12 +87,98 @@ export default function OrderBook() {
   const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
   const { setTotalVolumes } = useVolume();
-  const { data: orderBookData, isLoading, error } = useOrderBook("9", "2000");
+  const { base, quote } = useParams();
+  const [symbolID, setSymbolID] = useState();
+  const {
+    data: orderBookData,
+    isLoading: isLoadingOrderBook,
+    error: orderBookError,
+  } = useOrderBook(symbolID, "2000");
+
+  const { data: marketData } = useMarkets();
+  const { readyState, lastMessage, sendMessage } =
+    useInitialWebSocket(symbolID);
+
+  // console.log(marketData);
 
   useEffect(() => {
-    setAskOrders(orderBookData?.asks);
-    setBidOrders(orderBookData?.bids);
+    if (orderBookData) {
+      setAskOrders(orderBookData.asks);
+      setBidOrders(orderBookData.bids);
+    }
   }, [orderBookData]);
+
+  function unSubWebSocket(channelID, ID) {
+    sendMessage(
+      JSON.stringify({
+        unsubscribe: {
+          channel: `public-market:r-depth-${channelID}`,
+        },
+        id: ID,
+      }),
+    );
+  }
+  function subWebSocket(channelID, ID) {
+    setTimeout(() => {
+      sendMessage(
+        JSON.stringify({
+          subscribe: {
+            channel: `public-market:r-depth-${channelID}`,
+          },
+          id: ID,
+        }),
+      );
+    }, 1000);
+  }
+
+  const oldSymbolID = useRef(null);
+  const currentID = useRef(1);
+
+  useEffect(() => {
+    return () => {
+      if (oldSymbolID.current && readyState === WebSocket.OPEN) {
+        unSubWebSocket(oldSymbolID.current, currentID.current + 1);
+      }
+    };
+  }, [readyState]);
+
+  useEffect(() => {
+    if (symbolID && readyState === WebSocket.OPEN) {
+      currentID.current += 1;
+
+      if (oldSymbolID.current && oldSymbolID.current !== symbolID) {
+        unSubWebSocket(oldSymbolID.current, currentID.current);
+        currentID.current += 1;
+      }
+
+      subWebSocket(symbolID, currentID.current);
+      console.log("Subscribed to:", symbolID, "with ID:", currentID.current);
+      oldSymbolID.current = symbolID;
+    }
+  }, [symbolID, readyState, sendMessage]);
+
+  function irtToIrr(quote) {
+    let quoteType = quote === "IRT" ? "IRR" : "USDT";
+    return quoteType;
+  }
+  function findCurrencyID(base, quote) {
+    if (marketData && base && quote) {
+      const currency = marketData.find(
+        (currency) =>
+          currency.base_currency.id === base &&
+          currency.quote_currency.id === irtToIrr(quote),
+      );
+      if (currency) {
+        setSymbolID(currency.id);
+      } else {
+        console.error(`Currency not found for base: ${base}, quote: ${quote}`);
+      }
+    }
+  }
+
+  useEffect(() => {
+    findCurrencyID(base, quote);
+  }, [base, quote, marketData]);
 
   // Fix scroll side in sell list
   const sellListRef = useRef(null);
@@ -101,10 +189,8 @@ export default function OrderBook() {
   }, [steper]);
 
   // WebSocket setup
-  const { lastMessage } = useWebSocketData();
   const [aUpdate, setAUpdate] = useState([]);
   const [bUpdate, setBUpdate] = useState([]);
-  const [marketChangePrice, setMarketChangePrice] = useState(null);
 
   // Updater order with WebSocket
   const updateOrderbook = (currentOrders, updates, isAsk = true) => {
@@ -112,6 +198,7 @@ export default function OrderBook() {
     currentOrders.forEach((order) => {
       const price = parseFloat(order[0]);
       const volume = parseFloat(order[1]);
+      if (volume <= 0) return;
       if (!isNaN(price) && !isNaN(volume)) {
         orderMap.set(price, volume);
       }
@@ -144,11 +231,19 @@ export default function OrderBook() {
   // Log incoming WebSocket messages
   useEffect(() => {
     if (lastMessage?.data) {
+      // console.log("RAW WS DATA:", lastMessage.data);
       try {
         const messageData = JSON.parse(lastMessage.data);
+        // console.log("Parsed WS DATA:", messageData);
         if (Object.keys(messageData).length > 0 && messageData.push) {
-          setAUpdate(messageData.push.pub.data.a);
-          setBUpdate(messageData.push.pub.data.b);
+          const filteredAUpdate = messageData.push.pub.data.a.filter(
+            (update) => parseFloat(update[1]) > 0,
+          );
+          const filteredBUpdate = messageData.push.pub.data.b.filter(
+            (update) => parseFloat(update[1]) > 0,
+          );
+          setAUpdate(filteredAUpdate);
+          setBUpdate(filteredBUpdate);
         }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);

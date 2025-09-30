@@ -36,7 +36,7 @@ const useInitialWebSocket = (marketId) => {
 
       return;
     }
-    console.log(lastJsonMessage);
+    // console.log(lastJsonMessage);
   }, [lastJsonMessage, sendJsonMessage]);
 
   return {

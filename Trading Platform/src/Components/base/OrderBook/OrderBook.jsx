@@ -64,7 +64,11 @@ const aggregateOrders = (orders, step, isAsk = true) => {
   });
 
   let aggregatedList = Array.from(aggregatedMap.entries()).map(
-    ([price, volume]) => [price, volume.toFixed(2)],
+    ([price, volume]) => [
+      price,
+      volume,
+      // .toFixed(perecision)
+    ],
   );
 
   // سورتینگ بر اساس isAsk
@@ -84,6 +88,7 @@ export default function OrderBook() {
   const [bidOrders, setBidOrders] = useState([]);
   const [askOrders, setAskOrders] = useState([]);
   const { steper } = useAggregation();
+  const [perecision, setPerecision] = useState(2);
   const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
   const { setTotalVolumes } = useVolume();
@@ -152,7 +157,7 @@ export default function OrderBook() {
       }
 
       subWebSocket(symbolID, currentID.current);
-      console.log("Subscribed to:", symbolID, "with ID:", currentID.current);
+      // console.log("Subscribed to:", symbolID, "with ID:", currentID.current);
       oldSymbolID.current = symbolID;
     }
   }, [symbolID, readyState, sendMessage]);
@@ -170,6 +175,7 @@ export default function OrderBook() {
       );
       if (currency) {
         setSymbolID(currency.id);
+        setPerecision(currency.base_currency_precision);
       } else {
         console.error(`Currency not found for base: ${base}, quote: ${quote}`);
       }
@@ -177,8 +183,12 @@ export default function OrderBook() {
   }
 
   useEffect(() => {
+    setBidOrders([]);
+    setAskOrders([]);
+    setAUpdate([]);
+    setBUpdate([]);
     findCurrencyID(base, quote);
-  }, [base, quote, marketData]);
+  }, [base, quote, marketData, perecision]);
 
   // Fix scroll side in sell list
   const sellListRef = useRef(null);
@@ -224,14 +234,18 @@ export default function OrderBook() {
     // خروجی نهایی: [price (string), volume (string با toFixed(2))]
     return sortedOrders.map(([price, volume]) => [
       price.toString(),
-      volume.toFixed(2),
+      volume,
+      // .toFixed(perecision),
     ]);
   };
 
   // Log incoming WebSocket messages
   useEffect(() => {
     if (lastMessage?.data) {
-      // console.log("RAW WS DATA:", lastMessage.data);
+      const parsed = JSON.parse(lastMessage.data);
+      const channel = parsed?.push?.channel;
+      const marketId = channel ? channel.split("r-depth-")[1] : 0;
+      // console.log(marketId);
       try {
         const messageData = JSON.parse(lastMessage.data);
         // console.log("Parsed WS DATA:", messageData);
@@ -242,8 +256,10 @@ export default function OrderBook() {
           const filteredBUpdate = messageData.push.pub.data.b.filter(
             (update) => parseFloat(update[1]) > 0,
           );
-          setAUpdate(filteredAUpdate);
-          setBUpdate(filteredBUpdate);
+          if (Number(marketId) === symbolID) {
+            setAUpdate(filteredAUpdate);
+            setBUpdate(filteredBUpdate);
+          }
         }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
@@ -285,20 +301,26 @@ export default function OrderBook() {
   }, [bidOrdersAggregated]);
 
   const totalVolumeAsk = useMemo(() => {
-    return askOrdersAggregated
-      .reduce((sum, order) => sum + parseFloat(order[1]), 0)
-      .toFixed(2);
+    return askOrdersAggregated.reduce(
+      (sum, order) => sum + parseFloat(order[1]),
+      0,
+    );
+    // .toFixed(perecision);
   }, [askOrdersAggregated]);
 
   const totalVolumeBid = useMemo(() => {
-    return bidOrdersAggregated
-      .reduce((sum, order) => sum + parseFloat(order[1]), 0)
-      .toFixed(2);
+    return bidOrdersAggregated.reduce(
+      (sum, order) => sum + parseFloat(order[1]),
+      0,
+    );
+    // .toFixed(perecision);
   }, [bidOrdersAggregated]);
 
   useEffect(() => {
     setTotalVolumes({ ask: totalVolumeAsk, bid: totalVolumeBid });
   }, [totalVolumeAsk, totalVolumeBid]);
+
+  // console.log(askOrdersAggregated);
 
   return (
     <>
@@ -338,7 +360,10 @@ export default function OrderBook() {
                     {(askOrder[0] / 10).toLocaleString("en-US")}
                   </span>
                   <span className="w-full py-0.5 text-end text-xs">
-                    {(askOrder[1] * 1).toLocaleString("en-US")}
+                    {Number(askOrder[1] * 1).toLocaleString("en-US", {
+                      minimumFractionDigits: perecision,
+                      maximumFractionDigits: perecision,
+                    })}
                   </span>
                   <span className="w-full py-0.5 text-end text-xs">
                     {totalVolume.toLocaleString("en-US")}
@@ -391,7 +416,10 @@ export default function OrderBook() {
                     {(bidOrder[0] / 10).toLocaleString("en-US")}
                   </span>
                   <span className="w-full py-0.5 text-end text-xs">
-                    {(bidOrder[1] * 1).toLocaleString("en-US")}
+                    {Number(bidOrder[1] * 1).toLocaleString("en-US", {
+                      minimumFractionDigits: perecision,
+                      maximumFractionDigits: perecision,
+                    })}
                   </span>
                   <span className="w-full py-0.5 text-end text-xs">
                     {totalVolume.toLocaleString("en-US")}

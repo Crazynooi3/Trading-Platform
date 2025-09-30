@@ -11,10 +11,7 @@ import { useParams } from "react-router-dom";
 export default function Trick() {
   const [isShowSelectCurency, setShowSelectCurency] = useState(false);
   const [isShowSwipers, setShowSwipers] = useState(false);
-  const [selectedCurrency, setSelectedCurrency] = useState(9);
   const { base, quote } = useParams();
-
-  // const { totalMarkets } = useMarket();
 
   const isShowModalCurrency = () => {
     setShowSelectCurency != isShowSelectCurency;
@@ -35,20 +32,12 @@ export default function Trick() {
     };
   }, []);
 
-  const selectCurrencyFunc = (selected) => {
-    setSelectedCurrency(selected);
-  };
-
-  const findMarketFromID = (id) => {
-    // console.log(totalMarkets.data);
-  };
-  findMarketFromID("1");
   return (
     <div className="flex max-w-full items-center">
       <div className="relative flex items-center">
         <div className="group hover:bg-fill-fill4 mr-2 flex h-10 cursor-pointer items-center rounded-md px-2 py-1 transition-all">
           {/* Modal Select Currency */}
-          <SelectCurrency selectCurrencyFunc={selectCurrencyFunc} />
+          <SelectCurrency />
 
           {/* top Detile */}
           <div className="flex h-16 items-center">

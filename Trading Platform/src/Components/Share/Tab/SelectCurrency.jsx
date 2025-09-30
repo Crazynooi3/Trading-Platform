@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import OrderBookTabs from "./OrderBookTabs";
 import { useMarkets } from "../../../Utilities/Hooks/useMarket";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -8,7 +8,13 @@ export default function SelectCurrency(props) {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("All");
   const [activeSort, setActiveSort] = useState("None");
+  const [searchInputValue, setSearchInputValue] = useState();
   const { data: allMarketData, isLoading, error } = useMarkets();
+  const showMarkets = useMemo(() => {
+    console.log(allMarketData);
+  }, [searchInputValue]);
+
+  useEffect(() => {}, [searchInputValue]);
 
   // path maneger
   useEffect(() => {
@@ -37,8 +43,8 @@ export default function SelectCurrency(props) {
     }
   };
 
-  const onClickHandler = (CoinID) => {
-    props.selectCurrencyFunc(CoinID);
+  const inputHandler = (event) => {
+    setSearchInputValue(event.target.value);
   };
 
   return (
@@ -51,6 +57,8 @@ export default function SelectCurrency(props) {
             type="text"
             placeholder="Search"
             className="w-full text-xs outline-0 placeholder:text-xs"
+            // value={searchInputValue}
+            onChange={(e) => inputHandler(e)}
           />
         </div>
         {/* Tabs */}
@@ -198,7 +206,7 @@ export default function SelectCurrency(props) {
                     <li
                       key={currency.id}
                       className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[6px] px-2 text-nowrap"
-                      onClick={() => onClickHandler(currency.id)}
+                      // onClick={() => onClickHandler(currency.id)}
                     >
                       <span className="flex w-[180px] items-center">
                         <img

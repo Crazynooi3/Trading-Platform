@@ -23,6 +23,44 @@ export default function SelectCurrency(props) {
     }
   }, [navigate]);
 
+  const filteredMarkets = useMemo(() => {
+    if (!searchInputValue) return allMarketData || [];
+
+    // 🔹 نرمال‌سازی ورودی کاربر
+    let search = searchInputValue.toLowerCase();
+    if (search === "irt") search = "irr";
+
+    return allMarketData.filter((market) => {
+      if (!market.is_visible) return false;
+
+      const base = market.base_currency?.id?.toLowerCase() || "";
+      const quote = market.quote_currency?.id?.toLowerCase() || "";
+
+      // 🔹 نرمال‌سازی دیتا
+      const normalizedQuote = quote === "irr" ? "irt" : quote;
+
+      const enName =
+        market.base_currency?.currency_name?.en?.toLowerCase() || "";
+      const faName =
+        market.base_currency?.currency_name?.fa?.toLowerCase() || "";
+      const pair = `${base}${normalizedQuote}`; // مثل BTCIRT
+
+      // ✅ اولویت‌ها
+      if (pair === search) return true; // اولویت اول: جفت کامل
+      if (base === search || normalizedQuote === search) return true; // اولویت دوم: سمبل خالص
+      if (enName === search || faName === search) return true; // اولویت سوم: اسم دقیق
+
+      // ✅ جستجوی جزئی
+      return (
+        base.includes(search) ||
+        normalizedQuote.includes(search) ||
+        enName.includes(search) ||
+        faName.includes(search) ||
+        pair.includes(search)
+      );
+    });
+  }, [searchInputValue, allMarketData]);
+
   const convertCurrencyCode = (currency) => {
     return currency === "IRR" ? "IRT" : currency;
   };
@@ -44,7 +82,8 @@ export default function SelectCurrency(props) {
   };
 
   const inputHandler = (event) => {
-    setSearchInputValue(event.target.value);
+    let inputValue = event.target.value;
+    setSearchInputValue(inputValue.toUpperCase());
   };
 
   return (
@@ -56,8 +95,10 @@ export default function SelectCurrency(props) {
             id="search"
             type="text"
             placeholder="Search"
-            className="w-full text-xs outline-0 placeholder:text-xs"
-            // value={searchInputValue}
+            autoComplete="off"
+            spellCheck="false"
+            className="bold w-full text-sm font-bold outline-0 placeholder:text-xs"
+            value={searchInputValue}
             onChange={(e) => inputHandler(e)}
           />
         </div>
@@ -195,7 +236,7 @@ export default function SelectCurrency(props) {
           </div>
           <div className="custom-scrollbar h-[calc(100%-130px)] overflow-auto">
             <ul className="overflow-auto">
-              {allMarketData?.map((currency) => {
+              {filteredMarkets?.map((currency) => {
                 let base_currency = currency.base_currency.id;
                 let quote_currency = convertCurrencyCode(
                   currency.quote_currency.id,
@@ -206,7 +247,6 @@ export default function SelectCurrency(props) {
                     <li
                       key={currency.id}
                       className="hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[6px] px-2 text-nowrap"
-                      // onClick={() => onClickHandler(currency.id)}
                     >
                       <span className="flex w-[180px] items-center">
                         <img

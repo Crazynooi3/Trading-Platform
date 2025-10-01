@@ -11,6 +11,7 @@ import { useParams } from "react-router-dom";
 export default function Trick() {
   const [isShowSelectCurency, setShowSelectCurency] = useState(false);
   const [isShowSwipers, setShowSwipers] = useState(false);
+  const [isShowMarket, setIsShowMarket] = useState(false);
   const { base, quote } = useParams();
 
   const isShowModalCurrency = () => {
@@ -32,10 +33,16 @@ export default function Trick() {
     };
   }, []);
 
+  const showMarket = () => {
+    setIsShowMarket(!isShowMarket);
+  };
   return (
     <div className="flex max-w-full items-center">
       <div className="relative flex items-center">
-        <div className="group hover:bg-fill-fill4 mr-2 flex h-10 cursor-pointer items-center rounded-md px-2 py-1 transition-all">
+        <div
+          onMouseEnter={() => showMarket()}
+          className="group hover:bg-fill-fill4 mr-2 flex h-10 cursor-pointer items-center rounded-md px-2 py-1 transition-all"
+        >
           {/* Modal Select Currency */}
           <SelectCurrency />
 

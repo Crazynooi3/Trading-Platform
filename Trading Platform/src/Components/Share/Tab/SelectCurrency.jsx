@@ -10,11 +10,6 @@ export default function SelectCurrency(props) {
   const [activeSort, setActiveSort] = useState("None");
   const [searchInputValue, setSearchInputValue] = useState();
   const { data: allMarketData, isLoading, error } = useMarkets();
-  const showMarkets = useMemo(() => {
-    console.log(allMarketData);
-  }, [searchInputValue]);
-
-  useEffect(() => {}, [searchInputValue]);
 
   // path maneger
   useEffect(() => {
@@ -23,16 +18,29 @@ export default function SelectCurrency(props) {
     }
   }, [navigate]);
 
+  const finalMarketData = useMemo(() => {
+    if (activeTab === "New") {
+      // ✅ اینجا دیگه async لازم نیست
+      return [...allMarketData].reverse().slice(0, 10);
+    }
+    console.log(allMarketData);
+
+    return allMarketData;
+  }, [activeTab, allMarketData]);
+
   const filteredMarkets = useMemo(() => {
-    if (!searchInputValue) return allMarketData || [];
+    // اول فقط مارکت‌های visible
+    const visibleMarkets = (finalMarketData || []).filter(
+      (market) => market.is_visible,
+    );
+
+    if (!searchInputValue) return visibleMarkets;
 
     // 🔹 نرمال‌سازی ورودی کاربر
     let search = searchInputValue.toLowerCase();
     if (search === "irt") search = "irr";
 
-    return allMarketData.filter((market) => {
-      if (!market.is_visible) return false;
-
+    return visibleMarkets.filter((market) => {
       const base = market.base_currency?.id?.toLowerCase() || "";
       const quote = market.quote_currency?.id?.toLowerCase() || "";
 
@@ -46,9 +54,9 @@ export default function SelectCurrency(props) {
       const pair = `${base}${normalizedQuote}`; // مثل BTCIRT
 
       // ✅ اولویت‌ها
-      if (pair === search) return true; // اولویت اول: جفت کامل
-      if (base === search || normalizedQuote === search) return true; // اولویت دوم: سمبل خالص
-      if (enName === search || faName === search) return true; // اولویت سوم: اسم دقیق
+      if (pair === search) return true;
+      if (base === search || normalizedQuote === search) return true;
+      if (enName === search || faName === search) return true;
 
       // ✅ جستجوی جزئی
       return (
@@ -59,7 +67,7 @@ export default function SelectCurrency(props) {
         pair.includes(search)
       );
     });
-  }, [searchInputValue, allMarketData]);
+  }, [searchInputValue, finalMarketData]);
 
   const convertCurrencyCode = (currency) => {
     return currency === "IRR" ? "IRT" : currency;
@@ -141,30 +149,30 @@ export default function SelectCurrency(props) {
             </li>
             <li
               className={`flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 text-center text-xs font-medium text-nowrap ${
-                activeTab === "FX"
+                activeTab === "USDT"
                   ? "bg-fill-fill4 text-text-text0"
                   : "text-text-text4 bg-transparent"
               }`}
-              onClick={() => setActiveTab("FX")}
+              onClick={() => setActiveTab("USDT")}
             >
               <span className="flex gap-0.5">
-                <img
+                {/* <img
                   src="./../../../public/FireIcon.svg"
                   alt=""
                   className="h-4 w-4"
-                />
-                FX
+                /> */}
+                USDT
               </span>
             </li>
             <li
               className={`flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 text-center text-xs font-medium text-nowrap ${
-                activeTab === "MEME"
+                activeTab === "IRT"
                   ? "bg-fill-fill4 text-text-text0"
                   : "text-text-text4 bg-transparent"
               }`}
-              onClick={() => setActiveTab("MEME")}
+              onClick={() => setActiveTab("IRT")}
             >
-              <span className="flex gap-0.5">MEME</span>
+              <span className="flex gap-0.5">IRT</span>
             </li>
             <li
               className={`flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 text-center text-xs font-medium text-nowrap ${

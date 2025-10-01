@@ -12,7 +12,6 @@ const Chart = () => {
     }
     return quote;
   };
-  console.log(correctQuote);
 
   return (
     <div className="custom-height h-[calc(100vh-64px)]">

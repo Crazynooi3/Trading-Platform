@@ -13,6 +13,14 @@ const useInitialWebSocket = (marketId) => {
   } = useWebSocket(WS_URL, {
     onOpen: () => {
       sendMessage(JSON.stringify({ connect: { name: "js" }, id: 1 }));
+      sendMessage(
+        JSON.stringify({
+          subscribe: {
+            channel: `public-market:r-price-ag`,
+          },
+          id: 2,
+        }),
+      );
       //   console.log("WebSocket connected and initial connect message sent");
     },
     onClose: (event) => {

@@ -20,16 +20,25 @@ export default function SelectCurrency(props) {
 
   const finalMarketData = useMemo(() => {
     if (activeTab === "New") {
-      // ✅ اینجا دیگه async لازم نیست
       return [...allMarketData].reverse().slice(0, 10);
     }
-    console.log(allMarketData);
+    if (activeTab === "USDT") {
+      return [...allMarketData].filter((market) => {
+        const quote = market.quote_currency?.id?.toLowerCase() || "";
+        return quote === "usdt";
+      });
+    }
+    if (activeTab === "IRT") {
+      return [...allMarketData].filter((market) => {
+        const quote = market.quote_currency?.id?.toLowerCase() || "";
+        return quote === "irr";
+      });
+    }
 
     return allMarketData;
   }, [activeTab, allMarketData]);
 
   const filteredMarkets = useMemo(() => {
-    // اول فقط مارکت‌های visible
     const visibleMarkets = (finalMarketData || []).filter(
       (market) => market.is_visible,
     );

@@ -89,6 +89,8 @@ export default function OrderBook() {
   const [askOrders, setAskOrders] = useState([]);
   const { steper } = useAggregation();
   const [perecision, setPerecision] = useState(2);
+  const [lastPrice, setLastPrice] = useState(0);
+  const [USDTPrice, setUSDPTrice] = useState(0);
   const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
   const { setTotalVolumes } = useVolume();
@@ -110,6 +112,8 @@ export default function OrderBook() {
     if (orderBookData) {
       setAskOrders(orderBookData.asks);
       setBidOrders(orderBookData.bids);
+      findLastPrice();
+      findUSDTPrice();
     }
   }, [orderBookData]);
 
@@ -137,7 +141,7 @@ export default function OrderBook() {
   }
 
   const oldSymbolID = useRef(null);
-  const currentID = useRef(1);
+  const currentID = useRef(2);
 
   useEffect(() => {
     return () => {
@@ -175,11 +179,24 @@ export default function OrderBook() {
       );
       if (currency) {
         setSymbolID(currency.id);
-        setPerecision(currency.base_currency_precision);
+        setPerecision(currency.quote_currency_precision);
       } else {
         console.error(`Currency not found for base: ${base}, quote: ${quote}`);
       }
     }
+  }
+
+  function findLastPrice() {
+    const market = marketData.find((market) => market.id === symbolID);
+    setLastPrice(market?.last_price || 0);
+  }
+  function findUSDTPrice() {
+    const market = marketData.find(
+      (market) =>
+        market.base_currency.id === base && market.quote_currency.id === "USDT",
+    );
+
+    setUSDPTrice(base != "USDT" ? market?.last_price || 0 : "");
   }
 
   useEffect(() => {
@@ -241,36 +258,52 @@ export default function OrderBook() {
 
   // Log incoming WebSocket messages
   useEffect(() => {
-    if (lastMessage?.data) {
-      const parsed = JSON.parse(lastMessage.data);
+    if (!lastMessage?.data) return; // early return اگه data نباشه
+
+    let parsed;
+    try {
+      parsed = JSON.parse(lastMessage.data); // حالا parsed داخل try
       const channel = parsed?.push?.channel;
       const marketId = channel ? channel.split("r-depth-")[1] : 0;
-      // console.log(marketId);
-      try {
-        const messageData = JSON.parse(lastMessage.data);
-        // console.log("Parsed WS DATA:", messageData);
-        if (Object.keys(messageData).length > 0 && messageData.push) {
-          const filteredAUpdate = messageData.push.pub.data.a.filter(
-            (update) => parseFloat(update[1]) > 0,
-          );
-          const filteredBUpdate = messageData.push.pub.data.b.filter(
-            (update) => parseFloat(update[1]) > 0,
-          );
-          if (Number(marketId) === symbolID) {
-            setAUpdate(filteredAUpdate);
-            setBUpdate(filteredBUpdate);
-          }
-        }
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
+      if (channel === "public-market:r-price-ag") {
+        let lastPriceWeb = parsed.push.pub.data.data.filter(
+          (data) => data.m === symbolID,
+        );
+        setLastPrice(Number(lastPriceWeb[0].price));
       }
+
+      if (Object.keys(parsed).length > 0 && parsed.push) {
+        const filteredAUpdate = parsed.push.pub.data.a.filter(
+          (update) => parseFloat(update[1]) > 0,
+        );
+        const filteredBUpdate = parsed.push.pub.data.b.filter(
+          (update) => parseFloat(update[1]) > 0,
+        );
+        const channelName = parsed.push.channel;
+
+        if (Number(marketId) === symbolID) {
+          setAUpdate(filteredAUpdate);
+          setBUpdate(filteredBUpdate);
+
+          const newAskOrders = updateOrderbook(
+            askOrders,
+            filteredAUpdate,
+            true,
+          );
+          setAskOrders(newAskOrders);
+
+          const newBidOrders = updateOrderbook(
+            bidOrders,
+            filteredBUpdate,
+            false,
+          );
+          setBidOrders(newBidOrders);
+        }
+      }
+    } catch (error) {
+      console.error("Error parsing WebSocket message:", error);
+      return;
     }
-    // آپدیت asks
-    const newAskOrders = updateOrderbook(askOrders, aUpdate, true);
-    setAskOrders(newAskOrders);
-    // آپدیت bids
-    const newBidOrders = updateOrderbook(bidOrders, bUpdate, false);
-    setBidOrders(newBidOrders);
   }, [lastMessage]);
 
   const askOrdersAggregated = useMemo(() => {
@@ -320,7 +353,8 @@ export default function OrderBook() {
     setTotalVolumes({ ask: totalVolumeAsk, bid: totalVolumeBid });
   }, [totalVolumeAsk, totalVolumeBid]);
 
-  // console.log(askOrdersAggregated);
+  console.log(marketData);
+  console.log(perecision);
 
   return (
     <>
@@ -357,11 +391,14 @@ export default function OrderBook() {
                   onMouseEnter={() => setHoveredIndexAsk(index)}
                 >
                   <span className="text-danger-danger1 w-full text-start text-xs font-medium">
-                    {(askOrder[0] / 10).toLocaleString("en-US")}
+                    {(askOrder[0] / 10).toLocaleString("en-US", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: perecision,
+                    })}
                   </span>
                   <span className="w-full py-0.5 text-end text-xs">
-                    {Number(askOrder[1] * 1).toLocaleString("en-US", {
-                      minimumFractionDigits: perecision,
+                    {askOrder[1].toLocaleString("en-US", {
+                      minimumFractionDigits: 0,
                       maximumFractionDigits: perecision,
                     })}
                   </span>
@@ -379,8 +416,15 @@ export default function OrderBook() {
         </div>
         {/* LastPrice */}
         <div className="flex h-10 w-full items-center px-4">
-          <span className="text-success-success1 mr-2 text-lg">2.2571</span>
-          <span className="text-text-text4 text-sm underline">2.2571</span>
+          <span className="text-success-success1 mr-2 text-lg">
+            {Number(lastPrice / 10).toLocaleString("en-US", {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: perecision,
+            })}
+          </span>
+          <span className="text-text-text4 text-sm underline underline-offset-4">
+            {Number(USDTPrice).toLocaleString("en-US")}
+          </span>
         </div>
         {/* Buy part */}
         <div className="h-[calc(50%-1.25rem)]">
@@ -413,11 +457,14 @@ export default function OrderBook() {
                   className="border-fill-fill3 relative flex max-h-5 w-full cursor-pointer items-center justify-between border-dashed px-4 hover:border-b"
                 >
                   <span className="text-success-success1 w-full text-start text-xs font-medium">
-                    {(bidOrder[0] / 10).toLocaleString("en-US")}
+                    {(bidOrder[0] / 10).toLocaleString("en-US", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: perecision,
+                    })}
                   </span>
                   <span className="w-full py-0.5 text-end text-xs">
-                    {Number(bidOrder[1] * 1).toLocaleString("en-US", {
-                      minimumFractionDigits: perecision,
+                    {bidOrder[1].toLocaleString("en-US", {
+                      minimumFractionDigits: 0,
                       maximumFractionDigits: perecision,
                     })}
                   </span>

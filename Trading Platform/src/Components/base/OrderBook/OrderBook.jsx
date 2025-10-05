@@ -179,7 +179,13 @@ export default function OrderBook() {
       );
       if (currency) {
         setSymbolID(currency.id);
-        setPerecision(currency.quote_currency_precision);
+
+        setPerecision(
+          Math.max(
+            currency.quote_currency_precision,
+            currency.base_currency_precision,
+          ),
+        );
       } else {
         console.error(`Currency not found for base: ${base}, quote: ${quote}`);
       }
@@ -469,7 +475,10 @@ export default function OrderBook() {
                     })}
                   </span>
                   <span className="w-full py-0.5 text-end text-xs">
-                    {totalVolume.toLocaleString("en-US")}
+                    {totalVolume.toLocaleString("en-US", {
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: perecision,
+                    })}
                   </span>
                   <span
                     className="bg-success-success4 absolute right-0 -z-10 h-[calc(100%-2px)] transition-all duration-500"

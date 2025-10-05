@@ -91,6 +91,8 @@ export default function OrderBook() {
   const [perecision, setPerecision] = useState(2);
   const [lastPrice, setLastPrice] = useState(0);
   const [USDTPrice, setUSDPTrice] = useState(0);
+  console.log(USDTPrice);
+
   const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
   const { setTotalVolumes } = useVolume();
@@ -429,7 +431,10 @@ export default function OrderBook() {
             })}
           </span>
           <span className="text-text-text4 text-sm underline underline-offset-4">
-            {Number(USDTPrice).toLocaleString("en-US")}
+            {Number(USDTPrice).toLocaleString("en-US", {
+              minimumFractionDigits: 0,
+              maximumFractionDigits: perecision,
+            })}
           </span>
         </div>
         {/* Buy part */}

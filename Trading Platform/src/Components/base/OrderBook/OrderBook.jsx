@@ -2,18 +2,14 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useAggregation } from "../../../Utilities/Context/AggregationContext";
 import { useVolume } from "../../../Utilities/Context/VolumeContext";
 import { useOrderBook } from "../../../Utilities/Hooks/useOrderBook";
-// import { useWebSocketData } from "../../../Utilities/Context/WebSocketProvider";
 import { useMarkets } from "../../../Utilities/Hooks/useMarket";
 import { useParams } from "react-router-dom";
 import useInitialWebSocket from "../../../Utilities/Hooks/useWebSocket";
 
-// فانکشن helper برای محاسبه حجم کل
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
 
-// فانکشن جدید برای تجمیع سفارش‌ها بر اساس step
 const aggregateOrders = (orders, step, isAsk = true) => {
   if (step <= 1) {
-    // سورت بر اساس isAsk، بدون تغییر قیمت
     const sortedOrders = [...orders].sort((a, b) =>
       isAsk ? a[0] - b[0] : b[0] - a[0],
     );
@@ -22,7 +18,6 @@ const aggregateOrders = (orders, step, isAsk = true) => {
 
   const aggregatedMap = new Map();
 
-  // پیدا کردن max/min قیمت (به ریال)
   let maxPriceRial = -Infinity;
   let minPriceRial = Infinity;
   orders.forEach((order) => {
@@ -36,11 +31,9 @@ const aggregateOrders = (orders, step, isAsk = true) => {
     const volume = parseFloat(order[1]);
     const originalPriceTomani = originalPriceRial / 10; // تبدیل به تومان
 
-    // منطق رندینگ روی تومان
     let aggregatedPriceTomani;
     if (isAsk) {
       aggregatedPriceTomani = Math.ceil(originalPriceTomani / step) * step;
-      // محدود کردن به سرخط (روی تومان)
       const maxAllowedTomani = Math.ceil(maxPriceRial / 10 / step) * step;
       if (aggregatedPriceTomani > maxAllowedTomani) {
         aggregatedPriceTomani = Math.floor(maxPriceRial / 10 / step) * step;
@@ -64,21 +57,11 @@ const aggregateOrders = (orders, step, isAsk = true) => {
   });
 
   let aggregatedList = Array.from(aggregatedMap.entries()).map(
-    ([price, volume]) => [
-      price,
-      volume,
-      // .toFixed(perecision)
-    ],
+    ([price, volume]) => [price, volume],
   );
 
-  // سورتینگ بر اساس isAsk
   aggregatedList.sort((a, b) => (isAsk ? a[0] - b[0] : b[0] - a[0]));
-
-  // حداکثر 20 آیتم
   aggregatedList = aggregatedList.slice(0, 20);
-
-  // دیباگ: چاپ خروجی نهایی
-  // console.log("Aggregated output (rial):", aggregatedList);
 
   return aggregatedList;
 };
@@ -91,8 +74,6 @@ export default function OrderBook() {
   const [perecision, setPerecision] = useState(2);
   const [lastPrice, setLastPrice] = useState(0);
   const [USDTPrice, setUSDPTrice] = useState(0);
-  console.log(USDTPrice);
-
   const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
   const { setTotalVolumes } = useVolume();
@@ -107,8 +88,6 @@ export default function OrderBook() {
   const { data: marketData } = useMarkets();
   const { readyState, lastMessage, sendMessage } =
     useInitialWebSocket(symbolID);
-
-  // console.log(marketData);
 
   useEffect(() => {
     if (orderBookData) {
@@ -163,7 +142,6 @@ export default function OrderBook() {
       }
 
       subWebSocket(symbolID, currentID.current);
-      // console.log("Subscribed to:", symbolID, "with ID:", currentID.current);
       oldSymbolID.current = symbolID;
     }
   }, [symbolID, readyState, sendMessage]);
@@ -360,9 +338,6 @@ export default function OrderBook() {
   useEffect(() => {
     setTotalVolumes({ ask: totalVolumeAsk, bid: totalVolumeBid });
   }, [totalVolumeAsk, totalVolumeBid]);
-
-  console.log(marketData);
-  console.log(perecision);
 
   return (
     <>

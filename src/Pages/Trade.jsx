@@ -1,16 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import FuturesMainContent from "../Components/FuturesMainContent/FuturesMainContent";
 import { getMarketDataFromServer } from "../ReduxConfig/entities/marketDatas";
 import { getMarketOrdersFromServer } from "../ReduxConfig/entities/marketOrderbook";
+import WebSocketHandler from "./../Components/OrderBook/WebSocketHandler";
 import * as Func from "../Utilities/Funections";
 import Notice from "../Components/Notice/Notice";
+import { getCompletOrder } from "../ReduxConfig/entities/marketComplet";
 
 export default function Trade() {
   const marketDataSelector = useSelector((state) => state.marketsDatas);
   const { symbolID } = useSelector((state) => state.symbolIDPrecision);
   const { rPriceAg } = useSelector((state) => state.webSocketMessage);
+
   const dispatch = useDispatch();
   // ---------------------
   const [lastPrice, setLastPrice] = useState("");
@@ -23,6 +26,7 @@ export default function Trade() {
         setLastPrice(Number(lastPriceData[0].price));
       }
     }
+    dispatch(getCompletOrder(symbolID));
     document.title = `${base} / ${quote} | ${Number(
       lastPrice / 10,
     ).toLocaleString("en-US", {
@@ -44,6 +48,7 @@ export default function Trade() {
 
   return (
     <>
+      <WebSocketHandler symbolID={symbolID} />
       <Notice />
       <FuturesMainContent />
       <Outlet />

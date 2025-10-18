@@ -3,6 +3,7 @@ import marketsDatasReducer from "./entities/marketDatas";
 import marketOrderReducer from "./entities/marketOrderbook";
 import symbolIDPrecisionReducer from "./entities/symbolIDPerecision";
 import webSocketReducer from "./entities/webSocket";
+import completeOrderReducer from "./entities/marketComplet";
 
 export default configureStore({
   reducer: {
@@ -10,5 +11,6 @@ export default configureStore({
     marketOrderbook: marketOrderReducer,
     symbolIDPrecision: symbolIDPrecisionReducer,
     webSocketMessage: webSocketReducer,
+    completeOrder: completeOrderReducer,
   },
 });

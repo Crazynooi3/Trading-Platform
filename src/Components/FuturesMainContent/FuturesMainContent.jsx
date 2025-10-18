@@ -16,7 +16,9 @@ import { VolumeProvider } from "../../Utilities/Context/VolumeContext";
 import Trick from "../Trick/Trick";
 import ShortLongTrigger from "../Chart/ShortLongTrigger";
 import { AggregationProvider } from "../../Utilities/Context/AggregationContext";
+import Trades from "../OrderBook/Trades";
 export default function FuturesMainContent() {
+  const [activeTab, setActiveTab] = useState("Order Book");
   return (
     <AggregationProvider>
       <div className="grid grid-flow-row grid-cols-12 grid-rows-8">
@@ -33,10 +35,30 @@ export default function FuturesMainContent() {
         </div>
         <VolumeProvider>
           <div className="border-border-border1 col-span-2 row-span-6 border-l text-white xl:h-[650px]">
-            <OrderBookTabs tab1="Order Book" tab2="Trades" />
-            <OrderBookHeader />
-            <OrderBook />
-            <ShortLongTrigger />
+            <div className="border-border-border1 flex h-10 items-center justify-between border-b px-4">
+              <div className="flex h-full w-full items-center justify-between">
+                <div className="flex h-full items-center">
+                  <OrderBookTabs
+                    title="Order Book"
+                    state={activeTab}
+                    setState={setActiveTab}
+                  />
+                  <OrderBookTabs
+                    title="Trades"
+                    state={activeTab}
+                    setState={setActiveTab}
+                  />
+                </div>
+              </div>
+            </div>
+            {activeTab === "Order Book" && (
+              <>
+                <OrderBookHeader />
+                <OrderBook />
+                <ShortLongTrigger />
+              </>
+            )}
+            {activeTab === "Trades" && <Trades />}
           </div>
         </VolumeProvider>
         <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">

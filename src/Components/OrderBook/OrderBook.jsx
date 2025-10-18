@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import * as Func from "../../Utilities/Funections";
 import { useAggregation } from "../../Utilities/Context/AggregationContext";
 import { useVolume } from "../../Utilities/Context/VolumeContext";
-import WebSocketHandler from "./WebSocketHandler";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import usePrevious from "./../../Utilities/Hooks/usePrevious.js";
@@ -89,6 +88,7 @@ export default function OrderBook() {
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
   const { setTotalVolumes } = useVolume();
   const { base, quote } = useParams();
+  const prevSymbolID = usePrevious();
 
   // Updater order with WebSocket (merge updates with current orders)
   const updateOrderbook = useCallback(
@@ -158,8 +158,10 @@ export default function OrderBook() {
   useEffect(() => {
     setLastPrice(Func.findLastPrice(marketDataSelector.data, symbolID));
     setUSDPTrice(Func.findUSDTPrice(marketDataSelector.data, base));
-    setBidOrders([]);
-    setAskOrders([]);
+    if (prevSymbolID && prevSymbolID !== symbolID) {
+      setBidOrders([]);
+      setAskOrders([]);
+    }
   }, [symbolID]);
 
   useEffect(() => {
@@ -225,7 +227,6 @@ export default function OrderBook() {
 
   return (
     <>
-      <WebSocketHandler symbolID={symbolID} />
       <div className="mt-1 h-[calc(100%-9.2rem)]">
         {/* Sell part */}
         <div className="h-[calc(50%-1.25rem)]">

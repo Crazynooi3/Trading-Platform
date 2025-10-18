@@ -1,3 +1,4 @@
+import React from "react";
 import { AdvancedChart } from "react-tradingview-embed";
 import { useParams } from "react-router-dom";
 const Chart = () => {
@@ -34,4 +35,4 @@ const Chart = () => {
   );
 };
 
-export default Chart;
+export default React.memo(Chart);

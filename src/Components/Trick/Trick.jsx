@@ -108,7 +108,7 @@ export default function Trick() {
           className={` ${prevLastPrice >= lastprice ? "text-danger-danger1" : "text-success-success1"} text-2xl font-medium`}>
           {Number(lastprice / 10).toLocaleString("en-US", {
             minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
+            maximumFractionDigits: precision,
           })}
         </span>
       </div>

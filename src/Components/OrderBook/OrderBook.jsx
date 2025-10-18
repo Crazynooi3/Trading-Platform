@@ -156,18 +156,15 @@ export default function OrderBook() {
         const priceTomans = priceRial / 10; // normalize به تومان
         sumVolume += volume;
         sumPriceVolume += priceTomans * volume;
-        sumValueTomans += priceTomans * volume;
+        sumValueTomans += priceTomans * volume; // جمع totalVolume هر اردر (priceTomans * volume)
       }
 
       const avgPriceTomans = sumVolume > 0 ? sumPriceVolume / sumVolume : 0;
-      const avgPrice = parseFloat(avgPriceTomans.toFixed(precision || 5)); // fix: sumPriceVolume نه sumPriceVolume, + toFixed برای precision
+      const avgPrice = parseFloat(avgPriceTomans.toFixed(precision || 5));
 
-      const estimatedMargin =
-        usdtPrice > 0
-          ? parseFloat(
-              (sumValueTomans * sumPriceVolume).toFixed(precision || 5),
-            )
-          : 0;
+      const estimatedMargin = parseFloat(
+        sumValueTomans.toFixed(precision || 5),
+      ); // fix: جمع کل totalVolume ها (sumValueTomans)
 
       return {
         sum: sumVolume,
@@ -175,7 +172,7 @@ export default function OrderBook() {
         estimatedMargin,
       };
     },
-    [], // + precision dependency
+    [precision], // dependency روی precision (usdtPrice استفاده نمی‌شه)
   );
 
   useEffect(() => {
@@ -410,7 +407,7 @@ export default function OrderBook() {
             className={` ${prevLastPrice >= lastPrice ? "text-danger-danger1" : "text-success-success1"} mr-2 text-lg`}>
             {Number(lastPrice / 10).toLocaleString("en-US", {
               minimumFractionDigits: 0,
-              maximumFractionDigits: 0,
+              maximumFractionDigits: precision,
             })}
           </span>
           <span className="text-text-text4 text-sm underline underline-offset-4">

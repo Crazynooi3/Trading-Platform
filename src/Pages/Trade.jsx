@@ -13,7 +13,6 @@ export default function Trade() {
   const { symbolID } = useSelector((state) => state.symbolIDPrecision);
   const dispatch = useDispatch();
   // ---------------------
-  const [lastPrice, setLastPrice] = useState("");
   const { base, quote } = useParams();
 
   useEffect(() => {

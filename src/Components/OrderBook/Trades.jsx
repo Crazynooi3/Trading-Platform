@@ -1,10 +1,19 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getCompletOrder } from "../../ReduxConfig/entities/marketComplet";
 import "./index.css";
 
 export default function Trades() {
   const orderCompleteOrder = useSelector((state) => state.completeOrder);
-  console.log(orderCompleteOrder.data);
+  const { symbolID } = useSelector((state) => state.symbolIDPrecision);
+  const { rDepth, rPriceAg, currentSymbol } = useSelector(
+    (state) => state.webSocketMessage,
+  );
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getCompletOrder(symbolID));
+  }, [symbolID, rPriceAg]);
 
   return (
     <>

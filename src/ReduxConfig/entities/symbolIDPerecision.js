@@ -5,6 +5,7 @@ const initialState = {
   precision: null,
   day_change_percent: null,
   last_volume: null,
+  last_price: null,
   max_price: null,
   min_price: null,
   loading: false,
@@ -20,6 +21,7 @@ const symbolIDPrecisionSlice = createSlice({
       state.precision = action.payload.precision;
       state.day_change_percent = action.payload.day_change_percent;
       state.last_volume = action.payload.last_volume;
+      state.last_price = action.payload.last_price;
       state.max_price = action.payload.max_price;
       state.min_price = action.payload.min_price;
       state.loading = false;

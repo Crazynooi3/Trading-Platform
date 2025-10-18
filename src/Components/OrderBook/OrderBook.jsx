@@ -182,7 +182,6 @@ export default function OrderBook() {
         setLastPrice(Number(lastPriceData[0].price));
       }
     }
-    dispatch(getCompletOrder(symbolID));
     document.title = `${base} / ${quote} | ${Number(
       lastPrice / 10,
     ).toLocaleString("en-US", {

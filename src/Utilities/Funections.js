@@ -22,6 +22,7 @@ export const findCurrencyIDAction = (base, quote, marketData) => (dispatch) => {
       );
       const day_change_percent = currency.day_change_percent;
       const last_volume = currency.last_volume;
+      const last_price = currency.last_price;
       const max_price = currency.max_price;
       const min_price = currency.min_price;
       dispatch(
@@ -30,6 +31,7 @@ export const findCurrencyIDAction = (base, quote, marketData) => (dispatch) => {
           precision,
           day_change_percent,
           last_volume,
+          last_price,
           max_price,
           min_price,
         }),

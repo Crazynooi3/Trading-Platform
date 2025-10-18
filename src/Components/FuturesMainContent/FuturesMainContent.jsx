@@ -10,7 +10,6 @@ import OrderBookHeader from "../OrderBook/OrderBookHeader";
 import TPSL from "../Ordering/TPSL";
 import OpenPosition from "../OpenPosition/OpenPosition";
 import Chart from "../Chart/Chart";
-import SelectCurrency from "../Tab/SelectCurrency";
 import FuturesOrder from "../FuturesOrder/FuturesOrder";
 import { VolumeProvider } from "../../Utilities/Context/VolumeContext";
 import Trick from "../Trick/Trick";

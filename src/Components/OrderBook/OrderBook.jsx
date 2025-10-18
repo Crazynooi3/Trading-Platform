@@ -5,6 +5,7 @@ import { useVolume } from "../../Utilities/Context/VolumeContext";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import usePrevious from "./../../Utilities/Hooks/usePrevious.js";
+import { getCompletOrder } from "./../../ReduxConfig/entities/marketComplet.js";
 
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
 
@@ -76,7 +77,7 @@ export default function OrderBook() {
   const { rDepth, rPriceAg, currentSymbol } = useSelector(
     (state) => state.webSocketMessage,
   );
-
+  const dispatch = useDispatch();
   // -------------------------------------
   const [bidOrders, setBidOrders] = useState([]);
   const [askOrders, setAskOrders] = useState([]);
@@ -86,6 +87,16 @@ export default function OrderBook() {
   const [USDTPrice, setUSDPTrice] = useState(0);
   const [hoveredIndexAsk, setHoveredIndexAsk] = useState(null);
   const [hoveredIndexBid, setHoveredIndexBid] = useState(null);
+  const [cumulativeStatsAsk, setCumulativeStatsAsk] = useState({
+    sum: 0,
+    avgPrice: 0,
+    estimatedMargin: 0,
+  });
+  const [cumulativeStatsBid, setCumulativeStatsBid] = useState({
+    sum: 0,
+    avgPrice: 0,
+    estimatedMargin: 0,
+  });
   const { setTotalVolumes } = useVolume();
   const { base, quote } = useParams();
   const prevSymbolID = usePrevious();
@@ -127,6 +138,61 @@ export default function OrderBook() {
     [precision],
   );
 
+  const calculateCumulativeStats = useCallback(
+    (orders, startIndex, usdtPrice = 0) => {
+      if (!orders || orders.length === 0 || startIndex < 0) {
+        return { sum: 0, avgPrice: 0, estimatedMargin: 0 };
+      }
+
+      let sumVolume = 0;
+      let sumPriceVolume = 0; // برای VWAP
+      let sumValueTomans = 0; // total value = sum(priceTomans * volume) برای margin
+
+      for (let i = 0; i <= startIndex; i++) {
+        const priceRial = parseFloat(orders[i][0]);
+        const volume = parseFloat(orders[i][1]);
+        if (volume <= 0 || isNaN(priceRial) || isNaN(volume)) continue;
+
+        const priceTomans = priceRial / 10; // normalize به تومان
+        sumVolume += volume;
+        sumPriceVolume += priceTomans * volume;
+        sumValueTomans += priceTomans * volume;
+      }
+
+      const avgPriceTomans = sumVolume > 0 ? sumPriceVolume / sumVolume : 0;
+      const avgPrice = parseFloat(avgPriceTomans.toFixed(precision || 5)); // fix: sumPriceVolume نه sumPriceVolume, + toFixed برای precision
+
+      const estimatedMargin =
+        usdtPrice > 0
+          ? parseFloat(
+              (sumValueTomans * sumPriceVolume).toFixed(precision || 5),
+            )
+          : 0;
+
+      return {
+        sum: sumVolume,
+        avgPrice,
+        estimatedMargin,
+      };
+    },
+    [], // + precision dependency
+  );
+
+  useEffect(() => {
+    if (rPriceAg && rPriceAg.length > 0 && symbolID) {
+      const lastPriceData = rPriceAg.filter((data) => data.m === symbolID);
+      if (lastPriceData.length > 0) {
+        setLastPrice(Number(lastPriceData[0].price));
+      }
+    }
+    dispatch(getCompletOrder(symbolID));
+    document.title = `${base} / ${quote} | ${Number(
+      lastPrice / 10,
+    ).toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    })}`;
+  }, [rPriceAg, symbolID]);
   // Initial load from API
   useEffect(() => {
     if (
@@ -145,12 +211,12 @@ export default function OrderBook() {
     const filteredAUpdate = rDepth.a.filter(([_, qty]) => parseFloat(qty) > 0);
     const filteredBUpdate = rDepth.b.filter(([_, qty]) => parseFloat(qty) > 0);
     setAskOrders((prevAskOrders) => {
-      if (prevAskOrders.length === 0) return prevAskOrders; // skip اگر initial هنوز load نشده
+      if (prevAskOrders.length === 0) return prevAskOrders; // fix: prevAskOrders نه prevAskOrders
       return updateOrderbook(prevAskOrders, filteredAUpdate, true);
     });
 
     setBidOrders((prevBidOrders) => {
-      if (prevBidOrders.length === 0) return prevBidOrders; // skip اگر initial هنوز load نشده
+      if (prevBidOrders.length === 0) return prevBidOrders;
       return updateOrderbook(prevBidOrders, filteredBUpdate, false);
     });
   }, [rDepth, updateOrderbook]);
@@ -201,8 +267,10 @@ export default function OrderBook() {
 
   const maxTotalVolumeBid = useMemo(() => {
     if (bidOrdersAggregated.length === 0) return 0;
-    const totals = bidOrdersAggregated.map((order) =>
-      calculateTotalVolume(order[0], order[1]),
+    const totals = bidOrdersAggregated.map(
+      (
+        order, // fix: bidOrdersAggregated نه bidOrdersAggregated
+      ) => calculateTotalVolume(order[0], order[1]),
     );
     return Math.max(...totals);
   }, [bidOrdersAggregated]);
@@ -223,23 +291,72 @@ export default function OrderBook() {
 
   useEffect(() => {
     setTotalVolumes({ ask: totalVolumeAsk, bid: totalVolumeBid });
-  }, [totalVolumeAsk, totalVolumeBid]);
+  }, [totalVolumeAsk, totalVolumeBid, setTotalVolumes]);
 
   return (
     <>
       <div className="mt-1 h-[calc(100%-9.2rem)]">
-        {/* Sell part */}
-        <div className="h-[calc(50%-1.25rem)]">
+        {/* Sell part (Ask) */}
+        <div className="relative h-[calc(50%-1.25rem)]">
+          {/* Tooltip for Ask */}
+          {hoveredIndexAsk !== null && (
+            <div
+              className="bg-fill-fill2 absolute bottom-0 -left-65 min-w-60 space-y-1 rounded-sm p-3 text-xs shadow-lg"
+              style={{
+                bottom: `${hoveredIndexAsk < 10 ? hoveredIndexAsk * 20 + 10 : 10 * 20 + 10}px`, // از top: 0 برای index 0، +10px برای center
+                // transform: "translateY(-50%)", // vertical center
+              }}>
+              <div className="flex items-center justify-between gap-2 text-nowrap">
+                <span>Average Price:</span>
+                <span>
+                  ≈{" "}
+                  {cumulativeStatsAsk.avgPrice.toLocaleString("en-US", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: precision,
+                  })}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span>Sum:</span>
+                <span>
+                  {cumulativeStatsAsk.sum.toLocaleString("en-US", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: precision,
+                  })}{" "}
+                  {base}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span>Estimated margin:</span>
+                <span>
+                  {cumulativeStatsAsk.estimatedMargin.toLocaleString("en-US", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: precision,
+                  })}{" "}
+                  {quote}
+                </span>
+              </div>
+            </div>
+          )}
           <ul
-            onMouseLeave={() => setHoveredIndexAsk(null)}
+            onMouseLeave={() => {
+              setHoveredIndexAsk(null);
+              setCumulativeStatsAsk({
+                sum: 0,
+                avgPrice: 0,
+                estimatedMargin: 0,
+              });
+            }}
             ref={sellListRef}
             className="hide-scrollbar relative flex h-full w-full flex-col-reverse justify-start overflow-y-scroll text-nowrap">
+            {/* Highlight for Ask */}
             {hoveredIndexAsk !== null && (
-              <span
+              <div
                 className="bg-fill-fill1 absolute bottom-0 left-0 -z-20 w-full"
                 style={{
                   height: `${(hoveredIndexAsk + 1) * 20}px`,
-                }}></span>
+                }}
+              />
             )}
             {askOrdersAggregated.map((askOrder, index) => {
               const totalVolume = calculateTotalVolume(
@@ -255,7 +372,15 @@ export default function OrderBook() {
                 <li
                   key={index}
                   className="border-fill-fill3 relative flex max-h-5 w-full cursor-pointer items-center justify-between border-dashed px-4 hover:border-t"
-                  onMouseEnter={() => setHoveredIndexAsk(index)}>
+                  onMouseEnter={() => {
+                    setHoveredIndexAsk(index);
+                    const stats = calculateCumulativeStats(
+                      askOrdersAggregated,
+                      index,
+                      USDTPrice,
+                    );
+                    setCumulativeStatsAsk(stats);
+                  }}>
                   <span className="text-danger-danger1 w-full text-start text-xs font-medium">
                     {(askOrder[0] / 10).toLocaleString("en-US", {
                       minimumFractionDigits: 0,
@@ -296,17 +421,67 @@ export default function OrderBook() {
               })}
           </span>
         </div>
-        {/* Buy part */}
-        <div className="h-[calc(50%-1.25rem)]">
+        {/* Buy part (Bid) */}
+        <div className="relative h-[calc(50%-1.25rem)]">
+          {/* Tooltip for Bid */}
+          {hoveredIndexBid !== null && (
+            <div
+              className="bg-fill-fill2 absolute -left-65 min-w-60 space-y-1 rounded-sm p-3 text-xs shadow-lg"
+              style={{
+                top: `${hoveredIndexBid < 10 ? hoveredIndexBid * 20 + 10 : 10 * 20 + 10}px`, // از top: 0 برای index 0، +10px برای center
+                transform: "translateY(-50%)", // vertical center
+              }}>
+              <div className="flex items-center justify-between gap-2 text-nowrap">
+                <span>Average Price:</span>
+                <span>
+                  ≈{" "}
+                  {cumulativeStatsBid.avgPrice.toLocaleString("en-US", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: precision,
+                  })}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span>Sum:</span>
+                <span>
+                  {cumulativeStatsBid.sum.toLocaleString("en-US", {
+                    // fix: Bid
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: precision,
+                  })}{" "}
+                  {base}
+                </span>
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <span>Estimated margin:</span>
+                <span>
+                  {cumulativeStatsBid.estimatedMargin.toLocaleString("en-US", {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: precision,
+                  })}{" "}
+                  {quote}
+                </span>
+              </div>
+            </div>
+          )}
           <ul
-            onMouseLeave={() => setHoveredIndexBid(null)}
+            onMouseLeave={() => {
+              setHoveredIndexBid(null);
+              setCumulativeStatsBid({
+                sum: 0,
+                avgPrice: 0,
+                estimatedMargin: 0,
+              });
+            }}
             className="hide-scrollbar relative flex h-full w-full flex-col justify-start overflow-y-scroll text-nowrap">
+            {/* Highlight for Bid */}
             {hoveredIndexBid !== null && (
-              <span
+              <div
                 className="bg-fill-fill1 absolute top-0 left-0 -z-20 w-full"
                 style={{
                   height: `${(hoveredIndexBid + 1) * 20}px`,
-                }}></span>
+                }}
+              />
             )}
             {bidOrdersAggregated.map((bidOrder, index) => {
               const totalVolume = calculateTotalVolume(
@@ -320,7 +495,15 @@ export default function OrderBook() {
 
               return (
                 <li
-                  onMouseEnter={() => setHoveredIndexBid(index)}
+                  onMouseEnter={() => {
+                    setHoveredIndexBid(index);
+                    const stats = calculateCumulativeStats(
+                      bidOrdersAggregated,
+                      index,
+                      USDTPrice,
+                    ); // fix: param اضافی false حذف
+                    setCumulativeStatsBid(stats);
+                  }}
                   key={index}
                   className="border-fill-fill3 relative flex max-h-5 w-full cursor-pointer items-center justify-between border-dashed px-4 hover:border-b">
                   <span className="text-success-success1 w-full text-start text-xs font-medium">

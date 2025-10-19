@@ -33,37 +33,31 @@ export default function OpenPosition() {
         {/* Detials */}
         <div className="mt-4 flex items-center justify-between">
           <span className="text-text-text3 w-full text-xs font-medium">
-            Margin({base})
+            Balance ({base})
             <br />
             <span className="text-text-text0 text-xs font-medium">
               {!userBalanceBase && "----"}
-              {quote === "USDT" ||
-                (base === "USDT" &&
-                  Number(userBalanceBase?.balance).toLocaleString("en-US", {
-                    maximumFractionDigits: precision,
-                  }))}
-              {quote === "IRT" &&
-                base != "USDT" &&
-                Number(userBalanceBase?.balance / 10).toLocaleString("en-US", {
-                  maximumFractionDigits: precision,
-                })}{" "}
+              {Number(userBalanceBase?.balance).toLocaleString("en-US", {
+                maximumFractionDigits: precision,
+                roundingMode: "floor",
+              })}{" "}
               {base}
             </span>
           </span>
           <span className="text-text-text3 w-full text-end text-xs font-medium">
-            Margin({quote})
+            Balance ({quote})
             <br />
             <span className="text-text-text0 text-xs font-medium">
               {!userBalanceQuote && "----"}
-              {quote === "USDT" ||
-                (base === "USDT" &&
-                  Number(userBalanceQuote?.balance).toLocaleString("en-US", {
-                    maximumFractionDigits: precision,
-                  }))}
+              {quote === "USDT" &&
+                Number(userBalanceQuote?.balance).toLocaleString("en-US", {
+                  maximumFractionDigits: precision,
+                  roundingMode: "floor",
+                })}
               {quote === "IRT" &&
-                base != "USDT" &&
                 Number(userBalanceQuote?.balance / 10).toLocaleString("en-US", {
                   maximumFractionDigits: precision,
+                  roundingMode: "floor",
                 })}{" "}
               {quote}
             </span>
@@ -76,22 +70,13 @@ export default function OpenPosition() {
             <br />
             <span className="text-text-text0 text-xs font-medium">
               {!userBalanceBase && "----"}
-              {quote === "USDT" ||
-                (base === "USDT" &&
-                  Number(userBalanceBase?.blocked_balance).toLocaleString(
-                    "en-US",
-                    {
-                      maximumFractionDigits: precision,
-                    },
-                  ))}
-              {quote === "IRT" &&
-                base != "USDT" &&
-                Number(userBalanceBase?.blocked_balance / 10).toLocaleString(
-                  "en-US",
-                  {
-                    maximumFractionDigits: precision,
-                  },
-                )}{" "}
+              {Number(userBalanceBase?.blocked_balance).toLocaleString(
+                "en-US",
+                {
+                  maximumFractionDigits: precision,
+                  roundingMode: "floor",
+                },
+              )}{" "}
               {base}
             </span>
           </span>

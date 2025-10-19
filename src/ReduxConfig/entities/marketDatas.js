@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { useSelector } from "react-redux";
 
 const initialState = {
   data: [],
@@ -8,7 +9,9 @@ const initialState = {
 
 export const getMarketDataFromServer = createAsyncThunk(
   "marketData/getMarketDataFromServer",
-  async (_, { rejectWithValue }) => {
+  async (data, { rejectWithValue }) => {
+    console.log(data);
+
     try {
       const API_BASE_URL = "https://api.ompfinex.com/v1/market";
       const token = "";

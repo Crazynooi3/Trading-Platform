@@ -10,14 +10,18 @@ import Notice from "../Components/Notice/Notice";
 
 export default function Trade() {
   const marketDataSelector = useSelector((state) => state.marketsDatas);
+  const userTokenSelector = useSelector((state) => state.userToken);
+  console.log(marketDataSelector);
+
   const { symbolID } = useSelector((state) => state.symbolIDPrecision);
   const dispatch = useDispatch();
   // ---------------------
   const { base, quote } = useParams();
 
   useEffect(() => {
-    dispatch(getMarketDataFromServer());
-  }, []);
+    const tokenToSend = userTokenSelector.token || "";
+    dispatch(getMarketDataFromServer(tokenToSend));
+  }, [userTokenSelector.token, dispatch]);
 
   useEffect(() => {
     dispatch(Func.findCurrencyIDAction(base, quote, marketDataSelector.data));

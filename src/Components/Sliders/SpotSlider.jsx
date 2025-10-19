@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 
-export default function SpotSlider() {
-  const [position, setPosition] = useState(40);
+export default function SpotSlider({ sliderPercent, setSliderPercent }) {
   const sliderRef = useRef(null);
   const handleRef = useRef(null);
 
@@ -10,8 +9,8 @@ export default function SpotSlider() {
 
     const sliderRect = sliderRef.current.getBoundingClientRect();
     let newPosition = ((e.clientX - sliderRect.left) / sliderRect.width) * 100;
-    newPosition = Math.max(0, Math.min(100, newPosition)); // محدود کردن بین 0 تا 100
-    setPosition(newPosition);
+    newPosition = Math.max(0, Math.min(100, newPosition));
+    setSliderPercent(newPosition);
   };
 
   const handleMouseDown = () => {
@@ -37,7 +36,7 @@ export default function SpotSlider() {
         {/* خط progress روشن‌تر */}
         <div
           className="absolute top-0 left-1 h-1 bg-white"
-          style={{ width: `${position + 2}%` }}></div>
+          style={{ width: `${sliderPercent + 2}%` }}></div>
         {/* نقاط کوچک */}
         <div className="absolute -top-1/2 left-0 h-2.5 w-2.5 rounded-full border-2 border-[#b5b9bf] bg-[#17181e]"></div>
         <div className="absolute -top-1/2 left-1/4 h-2.5 w-2.5 rounded-full border-2 border-[#b5b9bf] bg-[#17181e]"></div>
@@ -49,7 +48,10 @@ export default function SpotSlider() {
           ref={handleRef}
           onMouseDown={handleMouseDown}
           className="group absolute -top-1.5 h-4 w-4 cursor-pointer rounded-full border-4 border-white bg-[#17181e] transition-transform hover:scale-110"
-          style={{ left: `${position + 2}%`, transform: "translateX(-50%)" }}>
+          style={{
+            left: `${sliderPercent + 2}%`,
+            transform: "translateX(-50%)",
+          }}>
           <span className="absolute -top-9 -left-3 hidden group-hover:block">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -63,7 +65,7 @@ export default function SpotSlider() {
               />
             </svg>
             <span className="absolute top-1/4 left-1/4 text-[8px]">
-              {Math.ceil(position)}%
+              {Math.ceil(sliderPercent)}%
             </span>
           </span>
         </div>

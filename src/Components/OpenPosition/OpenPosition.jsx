@@ -91,6 +91,7 @@ export default function OpenPosition() {
                     "en-US",
                     {
                       maximumFractionDigits: precision,
+                      roundingMode: "floor",
                     },
                   ))}
               {quote === "IRT" &&
@@ -99,6 +100,7 @@ export default function OpenPosition() {
                   "en-US",
                   {
                     maximumFractionDigits: precision,
+                    roundingMode: "floor",
                   },
                 )}{" "}
               {quote}

@@ -60,3 +60,10 @@ export function findUSDTPrice(marketDataSelector, base) {
   const USDTPrice = base != "USDT" ? market?.last_price || 0 : "";
   return USDTPrice;
 }
+
+export function currencyBalance(data, symbolName) {
+  const currentMarket = data.find((symbol) => {
+    return symbol.currency.id === symbolName;
+  });
+  return currentMarket;
+}

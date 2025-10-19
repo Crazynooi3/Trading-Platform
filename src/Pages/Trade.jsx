@@ -7,11 +7,11 @@ import { getMarketOrdersFromServer } from "../ReduxConfig/entities/marketOrderbo
 import WebSocketHandler from "./../Components/OrderBook/WebSocketHandler";
 import * as Func from "../Utilities/Funections";
 import Notice from "../Components/Notice/Notice";
+import { getUserWallet } from "../ReduxConfig/entities/userWallet";
 
 export default function Trade() {
   const marketDataSelector = useSelector((state) => state.marketsDatas);
   const userTokenSelector = useSelector((state) => state.userToken);
-  console.log(marketDataSelector);
 
   const { symbolID } = useSelector((state) => state.symbolIDPrecision);
   const dispatch = useDispatch();
@@ -21,6 +21,7 @@ export default function Trade() {
   useEffect(() => {
     const tokenToSend = userTokenSelector.token || "";
     dispatch(getMarketDataFromServer(tokenToSend));
+    dispatch(getUserWallet(tokenToSend));
   }, [userTokenSelector.token, dispatch]);
 
   useEffect(() => {

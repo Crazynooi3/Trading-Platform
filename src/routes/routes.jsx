@@ -16,26 +16,35 @@ export default function AppRoutes() {
     <Router>
       <Routes>
         <Route path="/" element={<Splash />} />
-        <Route
-          element={
-            <Auth>
-              <NavLayout />
-            </Auth>
-          }>
-          <Route path="trade" element={<Trade />} />
-          <Route path="trade/:base/:quote" element={<Trade />} />
+        <Route element={<NavLayout />}>
+          <Route
+            path="trade"
+            element={
+              <Auth>
+                <Trade />
+              </Auth>
+            }
+          />
+          <Route
+            path="trade/:base/:quote"
+            element={
+              <Auth>
+                <Trade />
+              </Auth>
+            }
+          />
         </Route>
       </Routes>
     </Router>
   );
 }
 
-const Auth = () => {
+const Auth = ({ children }) => {
   const token = localStorage.getItem("token");
   const dispatch = useDispatch();
   if (!token) dispatch(clearToken());
   React.useEffect(() => {
     dispatch(addToken(token));
   });
-  return <Outlet />;
+  return children;
 };

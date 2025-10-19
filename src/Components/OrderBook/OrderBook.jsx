@@ -5,11 +5,10 @@ import { useVolume } from "../../Utilities/Context/VolumeContext";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import usePrevious from "./../../Utilities/Hooks/usePrevious.js";
-import { getCompletOrder } from "./../../ReduxConfig/entities/marketComplet.js";
 
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
 
-const aggregateOrders = (orders, step, isAsk = true) => {
+const aggregateOrders = (orders, step, isAsk = true, quote) => {
   if (step <= 1) {
     const sortedOrders = [...orders].sort((a, b) =>
       isAsk ? a[0] - b[0] : b[0] - a[0],
@@ -18,6 +17,7 @@ const aggregateOrders = (orders, step, isAsk = true) => {
   }
 
   const aggregatedMap = new Map();
+  const multiplier = quote === "USDT" ? 1 : 10; // شرط اصلی: multiplier برای تبدیل
 
   let maxPriceRial = -Infinity;
   let minPriceRial = Infinity;
@@ -30,24 +30,29 @@ const aggregateOrders = (orders, step, isAsk = true) => {
   orders.forEach((order) => {
     const originalPriceRial = order[0];
     const volume = parseFloat(order[1]);
-    const originalPriceTomani = originalPriceRial / 10; // تبدیل به تومان
+
+    const originalPriceTomani = originalPriceRial / multiplier; // شرطی: برای USDT /1
 
     let aggregatedPriceTomani;
     if (isAsk) {
       aggregatedPriceTomani = Math.ceil(originalPriceTomani / step) * step;
-      const maxAllowedTomani = Math.ceil(maxPriceRial / 10 / step) * step;
+      const maxAllowedTomani =
+        Math.ceil(maxPriceRial / multiplier / step) * step; // شرطی /multiplier
       if (aggregatedPriceTomani > maxAllowedTomani) {
-        aggregatedPriceTomani = Math.floor(maxPriceRial / 10 / step) * step;
+        aggregatedPriceTomani =
+          Math.floor(maxPriceRial / multiplier / step) * step;
       }
     } else {
       aggregatedPriceTomani = Math.floor(originalPriceTomani / step) * step;
-      const minAllowedTomani = Math.floor(minPriceRial / 10 / step) * step;
+      const minAllowedTomani =
+        Math.floor(minPriceRial / multiplier / step) * step; // شرطی /multiplier
       if (aggregatedPriceTomani < minAllowedTomani) {
-        aggregatedPriceTomani = Math.ceil(minPriceRial / 10 / step) * step;
+        aggregatedPriceTomani =
+          Math.ceil(minPriceRial / multiplier / step) * step;
       }
     }
 
-    const aggregatedPriceRial = aggregatedPriceTomani * 10; // برگرد به ریال
+    const aggregatedPriceRial = aggregatedPriceTomani * multiplier; // شرطی *multiplier: برای USDT *1
 
     if (aggregatedMap.has(aggregatedPriceRial)) {
       const existingVolume = aggregatedMap.get(aggregatedPriceRial);
@@ -245,12 +250,12 @@ export default function OrderBook() {
 
   const askOrdersAggregated = useMemo(() => {
     if (!askOrders || askOrders.length === 0) return [];
-    return aggregateOrders(askOrders, steper, true);
+    return aggregateOrders(askOrders, steper, true, quote);
   }, [askOrders, steper]);
 
   const bidOrdersAggregated = useMemo(() => {
     if (!bidOrders || bidOrders.length === 0) return [];
-    return aggregateOrders(bidOrders, steper, false);
+    return aggregateOrders(bidOrders, steper, false, quote);
   }, [bidOrders, steper]);
 
   const maxTotalVolumeAsk = useMemo(() => {

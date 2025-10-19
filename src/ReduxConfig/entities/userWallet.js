@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { useSelector } from "react-redux";
 
 const initialState = {
   data: [],
@@ -7,11 +6,11 @@ const initialState = {
   error: null,
 };
 
-export const getMarketDataFromServer = createAsyncThunk(
-  "marketData/getMarketDataFromServer",
+export const getUserWallet = createAsyncThunk(
+  "userWallet/getUserWallet",
   async (token, { rejectWithValue }) => {
     try {
-      const API_BASE_URL = "https://api.ompfinex.com/v1/market";
+      const API_BASE_URL = `https://api.ompfinex.com/v1/user/wallet`;
       const response = await fetch(API_BASE_URL, {
         method: "GET",
         headers: {
@@ -30,31 +29,32 @@ export const getMarketDataFromServer = createAsyncThunk(
   },
 );
 
-const marketDataSlice = createSlice({
-  name: "markets-datas",
+const orderCompletSlice = createSlice({
+  name: "userWallet",
   initialState,
   reducers: {
-    clearmarketData: (state) => {
+    clearOrderData: (state) => {
       state.data = [];
       state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getMarketDataFromServer.pending, (state) => {
+      .addCase(getUserWallet.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getMarketDataFromServer.fulfilled, (state, action) => {
+      .addCase(getUserWallet.fulfilled, (state, action) => {
         state.loading = false;
         state.data = action.payload;
+        state.error = null;
       })
-      .addCase(getMarketDataFromServer.rejected, (state, action) => {
+      .addCase(getUserWallet.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { clearMarketData } = marketDataSlice.actions;
-export default marketDataSlice.reducer;
+export const { clearOrderData } = orderCompletSlice.actions;
+export default orderCompletSlice.reducer;

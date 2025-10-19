@@ -1,6 +1,23 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import * as Func from "./../../Utilities/Funections";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function OpenPosition() {
+  const [userBalanceBase, setUserBalanceBase] = useState([]);
+  const [userBalanceQuote, setUserBalanceQuote] = useState([]);
+  const { base, quote } = useParams();
+  const userWalletSelector = useSelector((state) => state.userWallet);
+  const { symbolID, precision } = useSelector(
+    (state) => state.symbolIDPrecision,
+  );
+  const quoteIRR = Func.irtToIrr(quote);
+  useEffect(() => {
+    setUserBalanceBase(Func.currencyBalance(userWalletSelector.data, base));
+    setUserBalanceQuote(
+      Func.currencyBalance(userWalletSelector.data, quoteIRR),
+    );
+  }, [userWalletSelector, base, quote]);
   return (
     <div className="mx-4 mt-4">
       <div className="flex items-center gap-2">
@@ -16,40 +33,91 @@ export default function OpenPosition() {
         {/* Detials */}
         <div className="mt-4 flex items-center justify-between">
           <span className="text-text-text3 w-full text-xs font-medium">
-            Liq. Price
+            Margin({base})
             <br />
-            <span className="text-text-text0 text-xs font-medium">0.0</span>
+            <span className="text-text-text0 text-xs font-medium">
+              {!userBalanceBase && "----"}
+              {quote === "USDT" ||
+                (base === "USDT" &&
+                  Number(userBalanceBase?.balance).toLocaleString("en-US", {
+                    maximumFractionDigits: precision,
+                  }))}
+              {quote === "IRT" &&
+                base != "USDT" &&
+                Number(userBalanceBase?.balance / 10).toLocaleString("en-US", {
+                  maximumFractionDigits: precision,
+                })}{" "}
+              {base}
+            </span>
           </span>
           <span className="text-text-text3 w-full text-end text-xs font-medium">
-            Liq. Price
+            Margin({quote})
             <br />
-            <span className="text-text-text0 text-xs font-medium">0.0</span>
+            <span className="text-text-text0 text-xs font-medium">
+              {!userBalanceQuote && "----"}
+              {quote === "USDT" ||
+                (base === "USDT" &&
+                  Number(userBalanceQuote?.balance).toLocaleString("en-US", {
+                    maximumFractionDigits: precision,
+                  }))}
+              {quote === "IRT" &&
+                base != "USDT" &&
+                Number(userBalanceQuote?.balance / 10).toLocaleString("en-US", {
+                  maximumFractionDigits: precision,
+                })}{" "}
+              {quote}
+            </span>
           </span>
         </div>
 
         <div className="mt-4 flex items-center justify-between">
           <span className="text-text-text3 w-full text-xs font-medium">
-            Margin(USDT)
+            Blocked Balance ({base})
             <br />
-            <span className="text-text-text0 text-xs font-medium">5.8</span>
+            <span className="text-text-text0 text-xs font-medium">
+              {!userBalanceBase && "----"}
+              {quote === "USDT" ||
+                (base === "USDT" &&
+                  Number(userBalanceBase?.blocked_balance).toLocaleString(
+                    "en-US",
+                    {
+                      maximumFractionDigits: precision,
+                    },
+                  ))}
+              {quote === "IRT" &&
+                base != "USDT" &&
+                Number(userBalanceBase?.blocked_balance / 10).toLocaleString(
+                  "en-US",
+                  {
+                    maximumFractionDigits: precision,
+                  },
+                )}{" "}
+              {base}
+            </span>
           </span>
           <span className="text-text-text3 w-full text-end text-xs font-medium">
-            Margin(USDT)
+            Balcked Balance({quote})
             <br />
-            <span className="text-text-text0 text-xs font-medium">5.8</span>
-          </span>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
-          <span className="text-text-text3 w-full text-xs font-medium">
-            Max Long(BTC)
-            <br />
-            <span className="text-text-text0 text-xs font-medium">0.001</span>
-          </span>
-          <span className="text-text-text3 w-full text-end text-xs font-medium">
-            Max Long(BTC)
-            <br />
-            <span className="text-text-text0 text-xs font-medium">0.001</span>
+            <span className="text-text-text0 text-xs font-medium">
+              {!userBalanceQuote && "----"}
+              {quote === "USDT" ||
+                (base === "USDT" &&
+                  Number(userBalanceQuote?.blocked_balance).toLocaleString(
+                    "en-US",
+                    {
+                      maximumFractionDigits: precision,
+                    },
+                  ))}
+              {quote === "IRT" &&
+                base != "USDT" &&
+                Number(userBalanceQuote?.blocked_balance / 10).toLocaleString(
+                  "en-US",
+                  {
+                    maximumFractionDigits: precision,
+                  },
+                )}{" "}
+              {quote}
+            </span>
           </span>
         </div>
       </div>

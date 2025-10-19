@@ -6,13 +6,30 @@ import * as Func from "./../../Utilities/Funections";
 import OrderInput from "../Input/OrderInput";
 
 export default function OrderPlace() {
+  const [orderType, setOrderType] = useState("Market");
+  const { base, quote } = useParams();
+  const orderTypeHandler = (e) => {
+    setOrderType(e.target.innerHTML);
+  };
   return (
     <div className="mt-4 px-4">
       <div className="flex items-center justify-between text-sm">
         <div className="space-x-4">
-          <span>Market</span>
-          <span className="text-text-text3">Limit</span>
-          <span className="text-text-text3">Trigger Order</span>
+          <span
+            className={`${orderType === "Market" && "!text-text-text1"} text-text-text3 hover:!text-text-text1 cursor-pointer`}
+            onClick={(e) => orderTypeHandler(e)}>
+            Market
+          </span>
+          <span
+            className={`${orderType === "Limit" && "!text-text-text1"} text-text-text3 hover:!text-text-text1 cursor-pointer`}
+            onClick={(e) => orderTypeHandler(e)}>
+            Limit
+          </span>
+          <span
+            className={`${orderType === "Trigger Order" && "!text-text-text1"} text-text-text3 hover:!text-text-text1 cursor-pointer`}
+            onClick={(e) => orderTypeHandler(e)}>
+            Trigger Order
+          </span>
         </div>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -28,35 +45,15 @@ export default function OrderPlace() {
           />
         </svg>
       </div>
-      {/* <div className="mt-4 flex items-center text-xs">
-        <span className="text-text-text3 mr-1">Available</span>
-        <span className="mr-1">
-          {!userBalance && "----"}
-          {quote === "USDT" &&
-            Number(userBalance?.balance).toLocaleString("en-US", {
-              maximumFractionDigits: precision,
-            })}
-          {quote === "IRT" &&
-            Number(userBalance?.balance / 10).toLocaleString("en-US", {
-              maximumFractionDigits: precision,
-            })}{" "}
-          {quote}
-        </span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="text-primary-primary3 size-4">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
-          />
-        </svg>
-      </div> */}
-      <OrderInput text="Size" detail=" XRP" />
+      {orderType === "Market" && <OrderInput text="Size" detail={base} />}
+      {orderType === "Limit" && (
+        <>
+          <OrderInput text="Price" detail={quote} />
+          <OrderInput text="Size" detail={base} />
+        </>
+      )}
+
+      {/* <OrderInput text="Size" detail=" XRP" /> */}
     </div>
   );
 }

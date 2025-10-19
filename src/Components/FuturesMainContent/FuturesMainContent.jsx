@@ -95,8 +95,8 @@ export default function FuturesMainContent() {
               </div>
             </div>
           </div>
-          <FuturesMarginTabs />
-          <TabTextWrapper />
+          {/* <FuturesMarginTabs /> */}
+          {/* <TabTextWrapper /> */}
           <OrderPlace />
           <SpotSlider />
           <TPSL />

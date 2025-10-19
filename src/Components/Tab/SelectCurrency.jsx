@@ -142,11 +142,11 @@ export default function SelectCurrency({ allMarketData }) {
         </div>
         {/* Tabs */}
         <div>
-          <OrderBookTabs
-            tab1="Favorites"
-            tab2="Margin Trade"
-            tab3="Spot Trade"
-          />
+          {/* <OrderBookTabs
+            title="Tools"
+            state={activeTabTrade}
+            setState={setActiveTabTrade}
+          /> */}
         </div>
         <div className="my-2 flex h-9 w-full">
           <ul className="flex items-center justify-center gap-1.5">

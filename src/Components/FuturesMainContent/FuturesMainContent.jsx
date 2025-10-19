@@ -18,6 +18,7 @@ import { AggregationProvider } from "../../Utilities/Context/AggregationContext"
 import Trades from "../OrderBook/Trades";
 export default function FuturesMainContent() {
   const [activeTab, setActiveTab] = useState("Order Book");
+  const [activeTabTrade, setActiveTabTrade] = useState("Trade");
   return (
     <AggregationProvider>
       <div className="grid grid-flow-row grid-cols-12 grid-rows-8">
@@ -61,7 +62,39 @@ export default function FuturesMainContent() {
           </div>
         </VolumeProvider>
         <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
-          <ElTabs />
+          <div className="border-border-border1 flex h-10 items-center justify-between border-b px-4">
+            <div className="flex h-full w-full items-center">
+              <div className="flex h-full w-full items-center">
+                <OrderBookTabs
+                  title="Trade"
+                  state={activeTabTrade}
+                  setState={setActiveTabTrade}
+                />
+                <OrderBookTabs
+                  title="Tools"
+                  state={activeTabTrade}
+                  setState={setActiveTabTrade}
+                />
+              </div>
+              <div className="flex h-full items-center gap-1 text-nowrap">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="size-4 text-white">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 0 1 0 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 0 1 0-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375Z"
+                  />
+                </svg>
+
+                <span className="text-xs font-medium">Use Bonuse</span>
+              </div>
+            </div>
+          </div>
           <FuturesMarginTabs />
           <TabTextWrapper />
           <OrderPlace />

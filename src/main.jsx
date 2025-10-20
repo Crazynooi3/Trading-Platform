@@ -1,12 +1,15 @@
 import { createRoot } from "react-dom/client";
-import App from "./App.jsx";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./Utilities/queryClient.js";
 import AppContainer from "./ReduxConfig/AppContainer.jsx";
+import Router from "./routes/routes.jsx";
 
 import "./index.css";
-import Router from "./routes/routes.jsx";
 
 createRoot(document.getElementById("root")).render(
   <AppContainer>
-    <Router />
+    <QueryClientProvider client={queryClient}>
+      <Router />
+    </QueryClientProvider>
   </AppContainer>,
 );

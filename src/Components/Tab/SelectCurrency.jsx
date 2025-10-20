@@ -275,7 +275,9 @@ export default function SelectCurrency({ allMarketData }) {
                 );
                 let symbol = base_currency + " / " + quote_currency;
                 return (
-                  <Link to={`/trade/${base_currency}/${quote_currency}`}>
+                  <Link
+                    key={currency.id}
+                    to={`/trade/${base_currency}/${quote_currency}`}>
                     <li
                       key={currency.id}
                       className={`${symbolID == currency.id ? "bg-fill-fill1" : ""} hover:bg-fill-fill1 flex h-9 cursor-pointer items-center justify-between rounded-[6px] px-2 text-nowrap`}>

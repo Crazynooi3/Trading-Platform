@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 
 export default function OrderInput({
@@ -15,12 +15,16 @@ export default function OrderInput({
 }) {
   const { base, quote } = useParams();
   const changeLastPrice = (price) => {
-    if (quote === "IRT" && base != "USDT") {
-      return price / 10;
+    if (typeof setInputPriceValue !== "function") return;
+    if (quote === "IRT") {
+      setInputPriceValue(price / 10);
     } else {
-      return price;
+      setInputPriceValue(price);
     }
   };
+  useEffect(() => {
+    changeLastPrice(lastPrice);
+  }, [sliderPercent, lastPrice, text]);
   return (
     <div className="mt-2">
       <div className="bg-fill-fill4 flex h-10 w-full items-center rounded-lg px-2.5 outline-white focus-within:outline hover:outline">
@@ -33,7 +37,7 @@ export default function OrderInput({
             value={
               sliderPercent > 0
                 ? Number(sliderPercent).toFixed() + "%"
-                : inputSizeValue
+                : (inputSizeValue ?? "")
             }
             dir="rtl"
             // maxLength={precision}
@@ -51,15 +55,14 @@ export default function OrderInput({
             inputMode="numeric"
             value={
               sliderPercent > 0
-                ? Number(changeLastPrice(lastPrice)).toFixed()
-                : inputPriceValue
+                ? Number(inputPriceValue).toFixed()
+                : (inputPriceValue ?? "")
             }
             dir="rtl"
             className="mr-3 w-full text-xs outline-0 focus:outline-0"
             onChange={(e) => {
               setInputPriceValue(e.target.value);
             }}
-            onClick={() => setSliderPercent(0)}
           />
         )}
 

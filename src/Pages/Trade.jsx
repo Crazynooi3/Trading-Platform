@@ -8,15 +8,10 @@ import WebSocketHandler from "./../Components/OrderBook/WebSocketHandler";
 import * as Func from "../Utilities/Funections";
 import Notice from "../Components/Notice/Notice";
 import { getUserWallet } from "../ReduxConfig/entities/userWallet";
-import { useUserOrder } from "../Utilities/Hooks/useUserOrder";
 
 export default function Trade() {
   const marketDataSelector = useSelector((state) => state.marketsDatas);
   const userTokenSelector = useSelector((state) => state.userToken);
-  const { data, isLoading, error, refetch } = useUserOrder(
-    userTokenSelector.token,
-    "PENDING",
-  );
 
   const { symbolID } = useSelector((state) => state.symbolIDPrecision);
   const dispatch = useDispatch();

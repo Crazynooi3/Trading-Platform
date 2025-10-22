@@ -21,8 +21,8 @@ export default function FuturesMainContent() {
   const [activeTabTrade, setActiveTabTrade] = useState("Trade");
   return (
     <AggregationProvider>
-      <div className="grid grid-flow-row grid-cols-12 grid-rows-8">
-        <div className="col-span-8 row-span-6 text-white">
+      <div className="grid max-h-[750px] grid-flow-row grid-cols-12 grid-rows-8">
+        <div className="col-span-8 row-span-8 min-h-0 text-white">
           {/* Trick */}
           <div className="flex h-16 items-center pr-4 pl-2">
             {/* Left */}
@@ -34,7 +34,7 @@ export default function FuturesMainContent() {
           <Chart />
         </div>
         <VolumeProvider>
-          <div className="border-border-border1 col-span-2 row-span-6 border-l text-white xl:h-[650px]">
+          <div className="border-border-border1 col-span-2 row-span-8 min-h-0 border-l text-white">
             <div className="border-border-border1 flex h-10 items-center justify-between border-b px-4">
               <div className="flex h-full w-full items-center justify-between">
                 <div className="flex h-full items-center">
@@ -61,7 +61,7 @@ export default function FuturesMainContent() {
             {activeTab === "Trades" && <Trades />}
           </div>
         </VolumeProvider>
-        <div className="border-border-border1 col-span-2 row-span-6 border-l text-white">
+        <div className="border-border-border1 col-span-2 row-span-8 min-h-0 border-l text-white">
           <div className="border-border-border1 flex h-10 items-center justify-between border-b px-4">
             <div className="flex h-full w-full items-center">
               <div className="flex h-full w-full items-center">
@@ -99,14 +99,17 @@ export default function FuturesMainContent() {
           {/* <TabTextWrapper /> */}
           <OrderPlace />
 
-          <TPSL />
+          {/* <TPSL /> */}
           <OpenPosition />
         </div>
+      </div>
 
-        <div className="text-text-text0 border-border-border1 col-span-10 row-span-2 border-t">
+      {/* Botton Part */}
+      <div className="grid h-[310px] grid-flow-row grid-cols-12 grid-rows-1">
+        <div className="text-text-text0 border-border-border1 col-span-10 row-span-1 border-t border-b">
           <FuturesOrder />
         </div>
-        <div className="text-text-text0 border-border-border1 col-span-2 row-span-2 border-t border-l">
+        <div className="text-text-text0 border-border-border1 col-span-2 row-span-1 border-t border-b border-l">
           5
         </div>
       </div>

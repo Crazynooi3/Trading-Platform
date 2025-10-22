@@ -36,7 +36,6 @@ const useOmpfinexWebSocket = () => {
       sendJsonMessage({ connect: { name: "js" }, id: currentID.current });
       currentID.current += 1;
 
-      // Initial sub to price-ag (always)
       const priceChannel = "public-market:r-price-ag";
       if (!subscribedChannels.current.has(priceChannel)) {
         sendJsonMessage({
@@ -45,14 +44,12 @@ const useOmpfinexWebSocket = () => {
         });
         subscribedChannels.current.add(priceChannel);
         currentID.current += 1;
-        // console.log(`Subscribed to ${priceChannel}`);
       }
     },
     onClose: (event) => console.log("WebSocket closed:", event),
     onError: (error) => console.error("WebSocket error:", error),
   });
 
-  // Heartbeat Echo: فقط برای exact {} از سرور (با flag prevent loop)
   const heartbeatRef = useRef(false);
   useEffect(() => {
     if (
@@ -62,8 +59,6 @@ const useOmpfinexWebSocket = () => {
     ) {
       heartbeatRef.current = true;
       sendJsonMessage({});
-      // console.log("Echoed heartbeat {}");
-      // Reset flag after short delay to allow next real heartbeat
       setTimeout(() => {
         heartbeatRef.current = false;
       }, 100);

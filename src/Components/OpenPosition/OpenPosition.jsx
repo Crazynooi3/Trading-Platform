@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import * as Func from "./../../Utilities/Funections";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import SpotBtn from "../Btn/SpotBtn";
 
 export default function OpenPosition() {
   const [userBalanceBase, setUserBalanceBase] = useState([]);
@@ -20,15 +21,6 @@ export default function OpenPosition() {
   }, [userWalletSelector, base, quote]);
   return (
     <div className="mx-4 mt-4">
-      <div className="flex items-center gap-2">
-        {/* BTN */}
-        <div className="bg- bg-green-green2 text-text-text0 hover:bg-green-green3 flex h-10 w-full cursor-pointer items-center justify-center rounded-lg text-sm font-semibold">
-          Buy Long
-        </div>
-        <div className="bg- bg bg-red-red2 text-text-text0 hover:bg-red-red3 flex h-10 w-full cursor-pointer items-center justify-center rounded-lg text-sm font-semibold">
-          Sell Short
-        </div>
-      </div>
       <div>
         {/* Detials */}
         <div className="mt-4 flex items-center justify-between">

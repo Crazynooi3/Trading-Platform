@@ -408,6 +408,7 @@ export default function OrderBook() {
         {/* LastPrice */}
         <div className="flex h-10 w-full items-center px-4">
           <span
+            id="lastPrice"
             className={` ${prevLastPrice >= lastPrice ? "text-danger-danger1" : "text-success-success1"} mr-2 text-lg`}>
             {Number(lastPrice / 10).toLocaleString("en-US", {
               minimumFractionDigits: 0,

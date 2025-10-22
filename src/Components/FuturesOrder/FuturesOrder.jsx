@@ -1,21 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import OrderBookTabs from "../Tab/OrderBookTabs";
-import TabsItems from "../Tab/TabsItems";
+import * as Func from "./../../Utilities/Funections";
+import { useUserOrder } from "../../Utilities/Hooks/useUserOrder";
+import { useSelector } from "react-redux";
 
+import "./index.css";
+import { DeleteUserOrder } from "../../Utilities/API/DeleteOrder";
 export default function FuturesOrder() {
+  const userTokenSelector = useSelector((state) => state.userToken);
+  const { data, isLoading, error, refetch } = useUserOrder(
+    userTokenSelector.token,
+    "PENDING",
+  );
+  const [activeTab, setActiveTab] = useState("Open Order");
+
+  const orderCansleHandler = (orderID) => {
+    DeleteUserOrder(userTokenSelector.token, orderID).then((res) => {
+      if (res.status === "OK") {
+        refetch();
+      }
+      console.log(res);
+    });
+  };
+
   return (
     <div>
-      <div className="flex flex-col">
+      <div className="flex h-full flex-col">
         <div className="border-border-border1 flex w-full items-center justify-between border-b">
-          <TabsItems
-            tab1="Positions"
-            tab2="Open Orders"
-            tab3="Order History"
-            tab4="Position History"
-            tab5="Trade History"
-            tab6="Transaction History"
-            tab7="Assets"
-          />
+          <div className="flex h-10 items-center px-2">
+            <OrderBookTabs
+              title={"Open Order"}
+              state={activeTab}
+              setState={setActiveTab}
+            />
+            <OrderBookTabs
+              title={"Order History"}
+              state={activeTab}
+              setState={setActiveTab}
+            />
+            <OrderBookTabs
+              title={"Trade History"}
+              state={activeTab}
+              setState={setActiveTab}
+            />
+          </div>
           <div className="flex items-center gap-3 px-4">
             <div className="flex items-center gap-1">
               <input
@@ -45,101 +73,113 @@ export default function FuturesOrder() {
             </div>
           </div>
         </div>
-        <div>
-          <div className="mx-4 text-xs">
-            <table className="w-full table-fixed appearance-none break-words break-all">
-              <thead className="h-10 text-nowrap">
-                <tr className="border-border-border1 table-row h-14 border-b font-normal">
-                  <th
-                    className="mb-[1px] w-[180px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Futures
-                  </th>
-                  <th
-                    className="mb-[1px] w-36 pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Size
-                  </th>
-                  <th
-                    className="mb-[1px] w-[188px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Unrealized PnL|% (L)
-                  </th>
-                  <th
-                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Entry Price
-                  </th>
-                  <th
-                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Breack Even Price
-                  </th>
-                  <th
-                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Mark Price
-                  </th>
-                  <th
-                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Liq. Price
-                  </th>
-                  <th
-                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Margin Ratio
-                  </th>
-                  <th
-                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Margin
-                  </th>
-                  <th
-                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    Position PnL
-                  </th>
-                  <th
-                    className="mb-[1px] pt-[11px] pb-2.5 text-start"
-                    colSpan={1}
-                    rowSpan={1}>
-                    TP/SL
-                  </th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td></td>
-                  <td></td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
 
-            <div></div>
-          </div>
+        <div className="custom-scrollbar mx-4 max-h-[260px] flex-1 overflow-y-scroll text-xs">
+          <table className="w-full appearance-none break-words break-all">
+            <thead className="relative h-10 text-nowrap">
+              <tr className="border-border-border1 bg-base-base1 sticky top-0 z-10 table-row h-14 border-b font-normal">
+                <th className="mb-[1px] w-[180px] pt-[11px] pb-2.5 pl-2 text-start">
+                  Time
+                </th>
+                <th className="mb-[1px] w-[180px] pt-[11px] pb-2.5 text-start">
+                  Tradeing Pairs
+                </th>
+                <th className="mb-[1px] w-36 pt-[11px] pb-2.5 text-start">
+                  Type
+                </th>
+                <th className="mb-[1px] w-[188px] pt-[11px] pb-2.5 text-start">
+                  Order Type
+                </th>
+                <th className="mb-[1px] pt-[11px] pb-2.5 text-start">
+                  Trigger Price
+                </th>
+                <th className="mb-[1px] pt-[11px] pb-2.5 text-start">
+                  Order Size
+                </th>
+                <th className="mb-[1px] pt-[11px] pb-2.5 text-start">
+                  Completed
+                </th>
+                <th className="mb-[1px] pt-[11px] pb-2.5 text-start">
+                  Completed Rate
+                </th>
+                <th className="mb-[1px] pt-[11px] pb-2.5 text-start">
+                  Not Completed
+                </th>
+                <th className="mb-[1px] pt-[11px] pr-2 pb-2.5 text-end">
+                  Action
+                </th>
+
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {data?.status === "OK" &&
+                data.data.map((order) => {
+                  const orderType =
+                    String(order.type).charAt(0).toUpperCase() +
+                    String(order.type).slice(1).toLowerCase();
+                  const [dateStr, fullTime] = order.created_at.split(" ");
+                  const time = fullTime.split(".")[0];
+
+                  const [gy, gm, gd] = dateStr.split("-").map(Number); // [2025, 10, 21]
+                  const [jy, jm, jd] = Func.gregorianToJalali(gy, gm, gd);
+                  const jalaliDate = Func.formatJalaliDate(jy, jm, jd); // "1404-08-29"
+                  const tehranTime = Func.formatTimeToTehran(order.created_at);
+
+                  return (
+                    <tr className="hover:bg-fill-fill1 h-14">
+                      <td className="pl-2">
+                        {jalaliDate}
+                        <br />
+                        {tehranTime}
+                      </td>
+                      <td>
+                        {" "}
+                        {order.market.base_currency.id} /{" "}
+                        {order.market.quote_currency.id === "IRR"
+                          ? "IRT"
+                          : order.market.quote_currency.id}
+                      </td>
+                      <td>
+                        {orderType === "Buy" ? (
+                          <span class="inline-flex items-center rounded-md bg-green-400/10 px-2 py-1 text-xs font-medium text-green-400 inset-ring inset-ring-green-500/20">
+                            {orderType} Order
+                          </span>
+                        ) : (
+                          <span class="inline-flex items-center rounded-md bg-red-400/10 px-2 py-1 text-xs font-medium text-red-400 inset-ring inset-ring-red-400/20">
+                            {orderType} Order
+                          </span>
+                        )}
+                      </td>
+                      <td>{order.execution} Order</td>
+                      <td>
+                        {Number(order.price / 10).toLocaleString("en-US")}
+                      </td>
+                      <td>
+                        {order.amount} {order.market.base_currency.id}
+                      </td>
+                      <td>
+                        {order.completed_amount} {order.market.base_currency.id}
+                      </td>
+                      <td>{(100 * order.completed_amount) / order.amount} %</td>
+                      <td>
+                        {order.amount - order.completed_amount}{" "}
+                        {order.market.base_currency.id}
+                      </td>
+                      <td className="pr-2 text-end">
+                        <button
+                          className="bg-fill-fill4 hover:bg-fill-fill6 border-fill-fill2 cursor-pointer rounded-sm border-[0.01px] p-2"
+                          onClick={() => orderCansleHandler(order.id)}>
+                          Cansle Order
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+
+          <div></div>
         </div>
       </div>
     </div>

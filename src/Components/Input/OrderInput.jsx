@@ -4,14 +4,18 @@ import { useParams } from "react-router-dom";
 export default function OrderInput({
   text,
   detail,
+  // -----
   sliderPercent,
   setSliderPercent,
-  setInputSizeValue,
+  // -----
   inputSizeValue,
-  precision,
-  lastPrice,
+  setInputSizeValue,
+  // -----
   inputPriceValue,
   setInputPriceValue,
+  // -----
+  precision,
+  lastPrice,
 }) {
   const { base, quote } = useParams();
   const changeLastPrice = (price) => {
@@ -25,6 +29,33 @@ export default function OrderInput({
   useEffect(() => {
     changeLastPrice(lastPrice);
   }, [sliderPercent, lastPrice, text]);
+
+  const setSizeState = () => {
+    if (typeof setInputSizeValue !== "function") return;
+    if (sliderPercent > 0) {
+      const size = Number(sliderPercent).toFixed() + "%";
+      setInputSizeValue(size);
+    } else {
+      setInputSizeValue(inputSizeValue ?? "");
+    }
+  };
+  const setPriceState = () => {
+    if (typeof setInputPriceValue !== "function") return;
+    if (sliderPercent > 0) {
+      const price =
+        quote === "IRT"
+          ? Number(lastPrice / 10).toFixed()
+          : Number(lastPrice).toFixed();
+      setInputPriceValue(price);
+    } else {
+      setInputPriceValue(inputSizeValue ?? "");
+    }
+  };
+  useEffect(() => {
+    setSizeState();
+    setPriceState();
+  }, [sliderPercent]);
+
   return (
     <div className="mt-2">
       <div className="bg-fill-fill4 flex h-10 w-full items-center rounded-lg px-2.5 outline-white focus-within:outline hover:outline">
@@ -34,18 +65,15 @@ export default function OrderInput({
             type="text"
             pattern="[0-9]*"
             inputMode="numeric"
-            value={
-              sliderPercent > 0
-                ? Number(sliderPercent).toFixed() + "%"
-                : (inputSizeValue ?? "")
-            }
+            value={inputSizeValue}
             dir="rtl"
-            // maxLength={precision}
             className="mr-3 w-full text-xs outline-0 focus:outline-0"
             onChange={(e) => {
               setInputSizeValue(e.target.value);
             }}
-            onClick={() => setSliderPercent(0)}
+            onClick={() => {
+              setSliderPercent(0);
+            }}
           />
         )}
         {text === "Price" && (
@@ -53,11 +81,7 @@ export default function OrderInput({
             type="text"
             pattern="[0-9]*"
             inputMode="numeric"
-            value={
-              sliderPercent > 0
-                ? Number(inputPriceValue).toFixed()
-                : (inputPriceValue ?? "")
-            }
+            value={inputPriceValue}
             dir="rtl"
             className="mr-3 w-full text-xs outline-0 focus:outline-0"
             onChange={(e) => {

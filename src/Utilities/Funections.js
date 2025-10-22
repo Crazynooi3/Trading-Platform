@@ -67,3 +67,55 @@ export function currencyBalance(data, symbolName) {
   });
   return currentMarket;
 }
+
+// Function برای تبدیل Gregorian به Jalali
+export function gregorianToJalali(gy, gm, gd) {
+  var g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+  var jy = gy <= 1600 ? 0 : 979;
+  gy -= gy <= 1600 ? 621 : 1600;
+  var gy2 = gm > 2 ? gy + 1 : gy;
+  var days =
+    365 * gy +
+    parseInt((gy2 + 3) / 4) -
+    parseInt((gy2 + 99) / 100) +
+    parseInt((gy2 + 399) / 400) -
+    80 +
+    gd +
+    g_d_m[gm - 1];
+  jy += 33 * parseInt(days / 12053);
+  days %= 12053;
+  jy += 4 * parseInt(days / 1461);
+  days %= 1461;
+  if (days > 365) {
+    jy += parseInt((days - 1) / 365);
+    days = (days - 1) % 365;
+  } else {
+    days = days;
+  }
+  var jm =
+    days < 186 ? 1 + parseInt(days / 31) : 7 + parseInt((days - 186) / 30);
+  var jd = 1 + (days < 186 ? days % 31 : (days - 186) % 30);
+  return [jy, jm, jd]; // [سال, ماه, روز]
+}
+
+// Helper برای فرمت کردن به string (مثل "1404-08-29")
+export function formatJalaliDate(jy, jm, jd) {
+  return `${jy.toString().padStart(4, "0")}-${jm.toString().padStart(2, "0")}-${jd.toString().padStart(2, "0")}`;
+}
+
+// Function برای فرمت زمان به timezone تهران
+export function formatTimeToTehran(createdAtStr) {
+  // createdAtStr رو به Date UTC تبدیل کن (Z برای UTC)
+  const utcDate = new Date(createdAtStr + "Z"); // مثلاً "2025-10-21 08:19:37.172394Z"
+
+  // فرمت به Tehran با Intl (fa-IR برای فارسی، اما فقط time می‌خوایم)
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tehran",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false, // 24-hour format
+  });
+
+  return formatter.format(utcDate); // مثلاً "11:49:37" (8:19 UTC + 3:30 = 11:49)
+}

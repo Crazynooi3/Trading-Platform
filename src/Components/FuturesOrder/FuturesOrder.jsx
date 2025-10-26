@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import OrderBookTabs from "../Tab/OrderBookTabs";
 import * as Func from "./../../Utilities/Funections";
-import { useUserOrder } from "../../Utilities/Hooks/useUserOrder";
-import { useSelector } from "react-redux";
+import { useUserOrderPolling } from "../../Utilities/Hooks/useUserOrder";
+import { useDispatch, useSelector } from "react-redux";
+import { DeleteUserOrder } from "../../Utilities/API/DeleteOrder";
+import { getUserWallet } from "../../ReduxConfig/entities/userWallet";
 
 import "./index.css";
-import { DeleteUserOrder } from "../../Utilities/API/DeleteOrder";
+import { toast } from "react-toastify";
+
 export default function FuturesOrder() {
+  const dispatch = useDispatch();
   const userTokenSelector = useSelector((state) => state.userToken);
-  const { data, isLoading, error, refetch } = useUserOrder(
+  const { data, isLoading, error, refetch } = useUserOrderPolling(
     userTokenSelector.token,
     "PENDING",
   );
@@ -18,8 +22,14 @@ export default function FuturesOrder() {
     DeleteUserOrder(userTokenSelector.token, orderID).then((res) => {
       if (res.status === "OK") {
         refetch();
+        dispatch(getUserWallet(userTokenSelector.token));
+        toast.success("سفارش لغو شد", {
+          position: "top-center",
+          autoClose: 5000,
+          rtl: true,
+          className: "toast",
+        });
       }
-      console.log(res);
     });
   };
 

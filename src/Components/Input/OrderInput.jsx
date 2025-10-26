@@ -16,6 +16,8 @@ export default function OrderInput({
   // -----
   precision,
   lastPrice,
+  setIsShowTooltip,
+  setIsShowTooltipPrice,
 }) {
   const { base, quote } = useParams();
   const changeLastPrice = (price) => {
@@ -42,11 +44,7 @@ export default function OrderInput({
   const setPriceState = () => {
     if (typeof setInputPriceValue !== "function") return;
     if (sliderPercent > 0) {
-      const price =
-        quote === "IRT"
-          ? Number(lastPrice / 10).toFixed()
-          : Number(lastPrice).toFixed();
-      setInputPriceValue(price);
+      setInputPriceValue(Number(lastPrice));
     } else {
       setInputPriceValue(inputSizeValue ?? "");
     }
@@ -72,6 +70,7 @@ export default function OrderInput({
               setInputSizeValue(e.target.value);
             }}
             onClick={() => {
+              setIsShowTooltip(false);
               setSliderPercent(0);
             }}
           />
@@ -87,6 +86,7 @@ export default function OrderInput({
             onChange={(e) => {
               setInputPriceValue(e.target.value);
             }}
+            onClick={() => setIsShowTooltipPrice(false)}
           />
         )}
 

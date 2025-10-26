@@ -29,7 +29,7 @@ export const getUserWallet = createAsyncThunk(
   },
 );
 
-const orderCompletSlice = createSlice({
+const userWalletSlice = createSlice({
   name: "userWallet",
   initialState,
   reducers: {
@@ -56,5 +56,5 @@ const orderCompletSlice = createSlice({
   },
 });
 
-export const { clearOrderData } = orderCompletSlice.actions;
-export default orderCompletSlice.reducer;
+export const { clearOrderData } = userWalletSlice.actions;
+export default userWalletSlice.reducer;

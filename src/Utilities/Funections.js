@@ -119,3 +119,19 @@ export function formatTimeToTehran(createdAtStr) {
 
   return formatter.format(utcDate); // مثلاً "11:49:37" (8:19 UTC + 3:30 = 11:49)
 }
+
+// برای محاسبه مقدار ورود به معامله در حالت درصد
+export function calculateVol(input, balance) {
+  if (typeof input === "string" && input.endsWith("%")) {
+    const percentValue = parseFloat(input.slice(0, -1));
+    if (isNaN(percentValue)) {
+      return NaN;
+    }
+    return (percentValue / 100) * balance; // محاسبه مقدار مطلق
+  }
+  const numericValue = parseFloat(input);
+  if (isNaN(numericValue)) {
+    return NaN; // ورودی نامعتبر
+  }
+  return numericValue;
+}

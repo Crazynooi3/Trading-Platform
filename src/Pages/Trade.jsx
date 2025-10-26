@@ -18,11 +18,27 @@ export default function Trade() {
   // ---------------------
   const { base, quote } = useParams();
 
+  // useEffect(() => {
+  //   const tokenToSend = userTokenSelector.token || "";
+  //   dispatch(getMarketDataFromServer(tokenToSend));
+  //   dispatch(getUserWallet(tokenToSend));
+  // }, [userTokenSelector.token, dispatch]);
+
   useEffect(() => {
-    const tokenToSend = userTokenSelector.token || "";
+    const tokenToSend = userTokenSelector?.token || "";
     dispatch(getMarketDataFromServer(tokenToSend));
-    dispatch(getUserWallet(tokenToSend));
-  }, [userTokenSelector.token, dispatch]);
+    if (tokenToSend) {
+      dispatch(getUserWallet(tokenToSend));
+    }
+    const interval = setInterval(() => {
+      if (tokenToSend) {
+        dispatch(getUserWallet(tokenToSend));
+      }
+    }, 5000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [userTokenSelector?.token, dispatch]);
 
   useEffect(() => {
     dispatch(Func.findCurrencyIDAction(base, quote, marketDataSelector.data));

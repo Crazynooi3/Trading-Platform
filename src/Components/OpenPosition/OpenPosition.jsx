@@ -77,17 +77,15 @@ export default function OpenPosition() {
             <br />
             <span className="text-text-text0 text-xs font-medium">
               {!userBalanceQuote && "----"}
-              {quote === "USDT" ||
-                (base === "USDT" &&
-                  Number(userBalanceQuote?.blocked_balance).toLocaleString(
-                    "en-US",
-                    {
-                      maximumFractionDigits: precision,
-                      roundingMode: "floor",
-                    },
-                  ))}
+              {quote === "USDT" &&
+                Number(userBalanceQuote?.blocked_balance).toLocaleString(
+                  "en-US",
+                  {
+                    maximumFractionDigits: precision,
+                    roundingMode: "floor",
+                  },
+                )}
               {quote === "IRT" &&
-                base != "USDT" &&
                 Number(userBalanceQuote?.blocked_balance / 10).toLocaleString(
                   "en-US",
                   {

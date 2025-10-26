@@ -312,3 +312,16 @@ body {
   -webkit-clip-path: polygon(0 0, 100% 0, 100% 100%);
   clip-path: polygon(0 0, 100% 100%, 0 100%);
 }
+
+.toast {
+  font-family: "Vazirmatn", sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 14px !important; /* اندازه فونت */
+  color: white !important;
+  max-width: -webkit-fit-content !important;
+  max-width: -moz-fit-content !important;
+  max-width: fit-content !important; /* عرض */
+  max-height: 40px !important; /* عرض */
+  text-wrap: nowrap !important;
+  border: solid var(--el-border-color-darker) 1px;
+}

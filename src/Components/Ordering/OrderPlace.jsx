@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useAddOrder } from "../../Utilities/Hooks/useAddOrder";
 import SpotSlider from "../Sliders/SpotSlider";
 import OrderInput from "../Input/OrderInput";
@@ -8,81 +8,254 @@ import SpotBtn from "../Btn/SpotBtn";
 import * as Func from "./../../Utilities/Funections";
 import TPSL from "./TPSL";
 import Tooltip from "../Tooltip/Tooltip";
+import { toast } from "react-toastify";
+import { getUserWallet } from "../../ReduxConfig/entities/userWallet";
+import { useMonitorOrder } from "../../Utilities/Hooks/useMonitorOrder";
 
 export default function OrderPlace() {
+  const dispatch = useDispatch();
   const { symbolID, precision } = useSelector(
     (state) => state.symbolIDPrecision,
   );
+  const [currentOrderId, setCurrentOrderId] = useState(null);
   const userTokenSelector = useSelector((state) => state.userToken);
   const { base, quote } = useParams();
-  // const { rPriceAg } = useSelector((state) => state.webSocketMessage);
   const userWalletSelector = useSelector((state) => state.userWallet);
+  // const { refetch } = useUserOrder(userTokenSelector.token, "PENDING");
 
   // --------------
   const [sliderPercent, setSliderPercent] = useState(0);
   const [userBalanceBase, setUserBalanceBase] = useState([]);
   const [userBalanceQuote, setUserBalanceQuote] = useState([]);
-
   const [orderType, setOrderType] = useState("Market");
   const [inputSizeValue, setInputSizeValue] = useState("");
   const [inputPriceValue, setInputPriceValue] = useState("");
   const [lastPrice, setLastPrice] = useState(0);
   const [isShowSizeTooltip, setIsShowTooltip] = useState(false);
-  const lastPriceStr = document.querySelector("#lastPrice");
-  // const lastPriceNum = parseFloat(lastPriceStr.replace(/,/g, ""));
+  const [isShowSizeTooltipPrice, setIsShowTooltipPrice] = useState(false);
+  const { mutate: addOrder, isPending: isAddingOrder } = useAddOrder();
 
-  const orderTypeHandler = (e) => {
-    setOrderType(e.target.innerHTML);
-  };
   useEffect(() => {
+    const lastPriceStr = document.querySelector("#lastPrice");
     if (lastPriceStr) {
       if (parseFloat(lastPriceStr.textContent.replace(/,/g, "")) > 0) {
         setLastPrice(parseFloat(lastPriceStr.textContent.replace(/,/g, "")));
       }
     }
-  }, [lastPriceStr]);
+  }, [sliderPercent]);
 
   const quoteIRR = Func.irtToIrr(quote);
   useEffect(() => {
-    setUserBalanceBase(Func.currencyBalance(userWalletSelector.data, base));
-    setUserBalanceQuote(
-      Func.currencyBalance(userWalletSelector.data, quoteIRR),
+    setUserBalanceBase(
+      Func.currencyBalance(userWalletSelector.data, base)?.balance,
     );
+    if (quoteIRR === "IRR") {
+      setUserBalanceQuote(
+        Func.currencyBalance(userWalletSelector.data, quoteIRR)?.balance / 10,
+      );
+    } else {
+      setUserBalanceQuote(
+        Func.currencyBalance(userWalletSelector.data, quoteIRR)?.balance,
+      );
+    }
   }, [userWalletSelector, base, quote]);
 
   const clearInputs = () => {
     setInputPriceValue("");
     setInputSizeValue("");
   };
-  const addUserOrderHandler = (amount, price, type, execution) => {
-    console.log("execution:", execution);
-    console.log("amount:", amount);
-    console.log("price:", price);
-    console.log("type:", type);
+
+  const addUserOrderHandlerBuy = (amount, price, type, execution) => {
+    const trueAmount = Func.calculateVol(amount, userBalanceQuote);
+    const truePrice = quote === "IRT" ? price * 10 : price;
+
     if (execution === "Market" && !amount) {
       setIsShowTooltip(true);
-      // setInterval(() => {
-      //   setIsShowTooltip(false);
-      // }, 5000);
+      return;
     }
-    if (
-      (execution === "Limit" && !amount) ||
-      (execution === "Limit" && !price)
-    ) {
+    if (execution === "Limit" && !amount) {
       setIsShowTooltip(true);
-      // setInterval(() => {
-      //   setIsShowTooltip(false);
-      // }, 5000);
+      return;
     }
-    // useAddOrder(
-    //   userTokenSelector.token,
-    //   symbolID,
-    //   amount,
-    //   price,
-    //   type,
-    //   execution,
-    // );
+    if (execution === "Limit" && !price) {
+      setIsShowTooltipPrice(true);
+      return;
+    }
+    if (execution === "Market" && amount) {
+      addOrder(
+        {
+          token: userTokenSelector.token,
+          marketID: symbolID,
+          amount: trueAmount,
+          type,
+          execution: "MARKET",
+        },
+        {
+          onSuccess: (response) => {
+            const orderId = response.data.id;
+            setCurrentOrderId(orderId);
+            dispatch(getUserWallet(userTokenSelector.token));
+            toast.success("سفارش خرید مارکت با موفقیت ثبت شد", {
+              position: "top-center",
+              autoClose: 5000,
+              rtl: true,
+              className: "toast",
+            });
+          },
+          onError: (error) => {
+            const errorMessage =
+              error.data?.message ||
+              error.message ||
+              "خطا در ثبت سفارش. لطفاً دوباره تلاش کنید.";
+            toast.error(errorMessage, {
+              position: "top-center",
+              autoClose: 5000,
+              rtl: true,
+              className: "toast",
+            });
+          },
+        },
+      );
+    }
+    if (execution === "Limit" && amount && price) {
+      addOrder(
+        {
+          token: userTokenSelector.token,
+          marketID: symbolID,
+          amount: trueAmount,
+          price: truePrice,
+          type,
+          execution: "LIMIT",
+        },
+        {
+          onSuccess: (response) => {
+            const orderId = response.data.id;
+            setCurrentOrderId(orderId);
+            dispatch(getUserWallet(userTokenSelector.token));
+            toast.success("سفارش خرید لیمیت با موفقیت ثبت شد", {
+              position: "top-center",
+              autoClose: 5000,
+              rtl: true,
+              className: "toast",
+            });
+            setInputPriceValue("");
+            setInputSizeValue("");
+          },
+          onError: (error) => {
+            const errorMessage =
+              error.data?.message ||
+              error.message ||
+              "خطا در ثبت سفارش. لطفاً دوباره تلاش کنید.";
+            toast.error(errorMessage, {
+              position: "top-center",
+              autoClose: 5000,
+              rtl: true,
+              className: "toast",
+            });
+          },
+        },
+      );
+    }
   };
+
+  const addUserOrderHandlerSell = (amount, price, type, execution) => {
+    const trueAmount = Func.calculateVol(amount, userBalanceBase);
+    const truePrice = quote === "IRT" ? price * 10 : price;
+    if (execution === "Market" && !amount) {
+      setIsShowTooltip(true);
+      return;
+    }
+    if (execution === "Limit" && !amount) {
+      setIsShowTooltip(true);
+      return;
+    }
+    if (execution === "Limit" && !price) {
+      setIsShowTooltipPrice(true);
+      return;
+    }
+
+    if (execution === "Market" && amount) {
+      addOrder(
+        {
+          token: userTokenSelector.token,
+          marketID: symbolID,
+          amount: trueAmount,
+          type,
+          execution: "MARKET",
+        },
+        {
+          onSuccess: (response) => {
+            const orderId = response.data.id;
+            setCurrentOrderId(orderId);
+            dispatch(getUserWallet(userTokenSelector.token));
+            toast.success("سفارش فروش مارکت با موفقیت ثبت شد", {
+              position: "top-center",
+              autoClose: 5000,
+              rtl: true,
+              className: "toast",
+            });
+          },
+          onError: (error) => {
+            const errorMessage =
+              error.data?.message ||
+              error.message ||
+              "خطا در ثبت سفارش. لطفاً دوباره تلاش کنید.";
+            toast.error(errorMessage, {
+              position: "top-center",
+              autoClose: 5000,
+              rtl: true,
+              className: "toast",
+            });
+          },
+        },
+      );
+    }
+    if (execution === "Limit" && amount && price) {
+      addOrder(
+        {
+          token: userTokenSelector.token,
+          marketID: symbolID,
+          amount: trueAmount,
+          price: truePrice,
+          type,
+          execution: "LIMIT",
+        },
+        {
+          onSuccess: (response) => {
+            const orderId = response.data.id;
+            setCurrentOrderId(orderId);
+            dispatch(getUserWallet(userTokenSelector.token));
+            toast.success("سفارش فروش لیمیت با موفقیت ثبت شد", {
+              position: "top-center",
+              autoClose: 5000,
+              rtl: true,
+              className: "toast",
+            });
+            setInputPriceValue("");
+            setInputSizeValue("");
+          },
+          onError: (error) => {
+            const errorMessage =
+              error.data?.message ||
+              error.message ||
+              "خطا در ثبت سفارش. لطفاً دوباره تلاش کنید.";
+            toast.error(errorMessage, {
+              position: "top-center",
+              autoClose: 5000,
+              rtl: true,
+              className: "toast",
+            });
+          },
+        },
+      );
+    }
+  };
+  const orderTypeHandler = (e) => {
+    setIsShowTooltip(false);
+    setIsShowTooltipPrice(false);
+    setOrderType(e.target.innerHTML);
+  };
+
   return (
     <>
       <div className="relative mt-4 px-4">
@@ -128,6 +301,7 @@ export default function OrderPlace() {
             <Tooltip
               title={"Please enter the size"}
               isShow={isShowSizeTooltip}
+              position={"-top-3 "}
             />
             <OrderInput
               text="Size"
@@ -137,6 +311,7 @@ export default function OrderPlace() {
               inputSizeValue={inputSizeValue}
               setInputSizeValue={setInputSizeValue}
               precision={precision}
+              setIsShowTooltip={setIsShowTooltip}
             />
           </>
         )}
@@ -144,7 +319,8 @@ export default function OrderPlace() {
           <>
             <Tooltip
               title={"Please enter the price"}
-              isShow={isShowSizeTooltip}
+              isShow={isShowSizeTooltipPrice}
+              position={"-top-3 "}
             />
             <OrderInput
               text="Price"
@@ -155,11 +331,12 @@ export default function OrderPlace() {
               setInputPriceValue={setInputPriceValue}
               precision={precision}
               lastPrice={lastPrice}
+              setIsShowTooltipPrice={setIsShowTooltipPrice}
             />
             <Tooltip
               title={"Please enter the size"}
               isShow={isShowSizeTooltip}
-              // position={}
+              position={"top-10 "}
             />
             <OrderInput
               text="Size"
@@ -169,6 +346,7 @@ export default function OrderPlace() {
               setInputSizeValue={setInputSizeValue}
               inputSizeValue={inputSizeValue}
               precision={precision}
+              setIsShowTooltip={setIsShowTooltip}
             />
           </>
         )}
@@ -186,8 +364,7 @@ export default function OrderPlace() {
               "bg-green-green2 text-text-text0 hover:bg-green-green3 flex h-10 w-full cursor-pointer items-center justify-center rounded-lg text-sm font-semibold"
             }
             onclick={() => {
-              // const amount = orderType === 'Market' ?
-              addUserOrderHandler(
+              addUserOrderHandlerBuy(
                 inputSizeValue,
                 inputPriceValue,
                 "buy",
@@ -200,6 +377,14 @@ export default function OrderPlace() {
             className={
               "bg-red-red2 text-text-text0 hover:bg-red-red3 flex h-10 w-full cursor-pointer items-center justify-center rounded-lg text-sm font-semibold"
             }
+            onclick={() => {
+              addUserOrderHandlerSell(
+                inputSizeValue,
+                inputPriceValue,
+                "sell",
+                orderType,
+              );
+            }}
           />
         </div>
       </div>

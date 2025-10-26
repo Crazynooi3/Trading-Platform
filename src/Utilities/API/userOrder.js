@@ -1,7 +1,7 @@
-async function GetUserOrder(token, status, market_id) {
+async function GetUserOrder(token, status, market_id, page) {
   const url = market_id
     ? `https://api.ompfinex.com/v2/user/order?status=${status}&market_id=${market_id}`
-    : `https://api.ompfinex.com/v2/user/order?status=${status}`;
+    : `https://api.ompfinex.com/v2/user/order?status=${status}&page=${page}&limit=15`;
   try {
     const response = await fetch(url, {
       method: "GET",

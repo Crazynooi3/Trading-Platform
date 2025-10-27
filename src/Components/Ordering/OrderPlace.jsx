@@ -10,7 +10,7 @@ import TPSL from "./TPSL";
 import Tooltip from "../Tooltip/Tooltip";
 import { toast } from "react-toastify";
 import { getUserWallet } from "../../ReduxConfig/entities/userWallet";
-import { useMonitorOrder } from "../../Utilities/Hooks/useMonitorOrder";
+import { Slider } from "antd";
 
 export default function OrderPlace() {
   const dispatch = useDispatch();
@@ -255,7 +255,7 @@ export default function OrderPlace() {
     setIsShowTooltipPrice(false);
     setOrderType(e.target.innerHTML);
   };
-
+  const formatter = (value) => `${value}%`;
   return (
     <>
       <div className="relative mt-4 px-4">
@@ -351,10 +351,23 @@ export default function OrderPlace() {
           </>
         )}
       </div>
-      <SpotSlider
-        setSliderPercent={setSliderPercent}
-        sliderPercent={sliderPercent}
-      />
+      <div className="px-7 py-4">
+        <Slider
+          value={sliderPercent}
+          onChange={setSliderPercent}
+          min={0}
+          max={100}
+          step={1}
+          marks={{
+            0: "0%",
+            25: "25%",
+            50: "50%",
+            75: "75%",
+            100: "100%",
+          }}
+          tipFormatter={formatter}
+        />
+      </div>
       <TPSL />
       <div className="mx-4 mt-4">
         <div className="flex items-center gap-2">

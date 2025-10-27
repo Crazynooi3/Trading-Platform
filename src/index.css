@@ -325,3 +325,24 @@ body {
   text-wrap: nowrap !important;
   border: solid var(--el-border-color-darker) 1px;
 }
+
+.ant-slider {
+  margin: 0 !important;
+}
+.ant-slider-rail {
+  background-color: #2d2f35 !important;
+}
+.ant-slider-track {
+  background-color: white !important;
+}
+.ant-slider-mark-text {
+  display: none !important;
+}
+.ant-slider-dot {
+  background-color: #101112 !important;
+  border: 2px solid white !important;
+}
+.ant-slider-handle::after {
+  box-shadow: 0 0 0 3px white !important;
+  background-color: #2d2f35 !important;
+}

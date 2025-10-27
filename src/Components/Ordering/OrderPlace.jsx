@@ -27,6 +27,8 @@ export default function OrderPlace() {
   const [sliderPercent, setSliderPercent] = useState(0);
   const [userBalanceBase, setUserBalanceBase] = useState([]);
   const [userBalanceQuote, setUserBalanceQuote] = useState([]);
+  const [avaibleBalanceBase, setAvaibleBalanceBase] = useState(null);
+  const [avaibleBalanceQuote, setAvaibleBalanceQuote] = useState(null);
   const [orderType, setOrderType] = useState("Market");
   const [inputSizeValue, setInputSizeValue] = useState("");
   const [inputPriceValue, setInputPriceValue] = useState("");
@@ -46,18 +48,28 @@ export default function OrderPlace() {
 
   const quoteIRR = Func.irtToIrr(quote);
   useEffect(() => {
-    setUserBalanceBase(
-      Func.currencyBalance(userWalletSelector.data, base)?.balance,
-    );
+    setUserBalanceBase(Func.currencyBalance(userWalletSelector.data, base));
     if (quoteIRR === "IRR") {
       setUserBalanceQuote(
-        Func.currencyBalance(userWalletSelector.data, quoteIRR)?.balance / 10,
+        Func.currencyBalance(userWalletSelector.data, quoteIRR),
       );
     } else {
       setUserBalanceQuote(
-        Func.currencyBalance(userWalletSelector.data, quoteIRR)?.balance,
+        Func.currencyBalance(userWalletSelector.data, quoteIRR),
       );
     }
+    setAvaibleBalanceBase(
+      Number(userBalanceBase?.balance) -
+        Number(userBalanceBase?.blocked_balance),
+    );
+    setAvaibleBalanceQuote(
+      quoteIRR === "IRR"
+        ? (Number(userBalanceQuote?.balance) -
+            Number(userBalanceQuote?.blocked_balance)) /
+            10
+        : Number(userBalanceQuote?.balance) -
+            Number(userBalanceQuote?.blocked_balance),
+    );
   }, [userWalletSelector, base, quote]);
 
   const clearInputs = () => {
@@ -66,7 +78,12 @@ export default function OrderPlace() {
   };
 
   const addUserOrderHandlerBuy = (amount, price, type, execution) => {
-    const trueAmount = Func.calculateVol(amount, userBalanceQuote);
+    const trueAmount = Func.calculateVol(
+      amount,
+      avaibleBalanceQuote,
+      "buy",
+      lastPrice,
+    );
     const truePrice = quote === "IRT" ? price * 10 : price;
 
     if (execution === "Market" && !amount) {
@@ -159,7 +176,12 @@ export default function OrderPlace() {
   };
 
   const addUserOrderHandlerSell = (amount, price, type, execution) => {
-    const trueAmount = Func.calculateVol(amount, userBalanceBase);
+    const trueAmount = Func.calculateVol(
+      amount,
+      avaibleBalanceBase,
+      "sell",
+      lastPrice,
+    );
     const truePrice = quote === "IRT" ? price * 10 : price;
     if (execution === "Market" && !amount) {
       setIsShowTooltip(true);

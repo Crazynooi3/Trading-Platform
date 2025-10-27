@@ -121,17 +121,46 @@ export function formatTimeToTehran(createdAtStr) {
 }
 
 // برای محاسبه مقدار ورود به معامله در حالت درصد
-export function calculateVol(input, balance) {
+export function calculateVol(input, balance, side, price) {
+  // Coerce to numbers if strings or invalid
+  balance = typeof balance === "string" ? parseFloat(balance) : Number(balance);
+  price = typeof price === "string" ? parseFloat(price) : Number(price);
+
+  // اعتبارسنجی (حالا بعد از coerce)
+  if (isNaN(balance) || balance < 0) {
+    return NaN; // به جای throw، NaN برگردون تا UI هندل کنه (مثل نمایش "خطا")
+  }
+  if (isNaN(price) || price <= 0) {
+    return NaN; // مشابه
+  }
+  if (!["buy", "sell"].includes(side)) {
+    return NaN;
+  }
+
+  // محاسبه مقدار ورودی (درصد یا مطلق)
+  let vol;
   if (typeof input === "string" && input.endsWith("%")) {
     const percentValue = parseFloat(input.slice(0, -1));
-    if (isNaN(percentValue)) {
+    if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) {
       return NaN;
     }
-    return (percentValue / 100) * balance; // محاسبه مقدار مطلق
+    vol = (percentValue / 100) * balance;
+  } else {
+    const numericValue = parseFloat(input);
+    if (isNaN(numericValue) || numericValue < 0) {
+      return NaN;
+    }
+    vol = numericValue;
   }
-  const numericValue = parseFloat(input);
-  if (isNaN(numericValue)) {
-    return NaN; // ورودی نامعتبر
+
+  // هندل کردن بر اساس side
+  if (side === "buy") {
+    // خرید: vol (تومان) / price = USDT
+    return vol / price;
+  } else if (side === "sell") {
+    // فروش: vol مستقیم USDT (از موجودی base)
+    return vol;
   }
-  return numericValue;
+
+  return NaN;
 }

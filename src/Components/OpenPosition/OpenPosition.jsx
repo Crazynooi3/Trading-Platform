@@ -12,6 +12,7 @@ export default function OpenPosition() {
   const { symbolID, precision } = useSelector(
     (state) => state.symbolIDPrecision,
   );
+
   const quoteIRR = Func.irtToIrr(quote);
   useEffect(() => {
     setUserBalanceBase(Func.currencyBalance(userWalletSelector.data, base));
@@ -23,6 +24,47 @@ export default function OpenPosition() {
     <div className="mx-4 mt-4">
       <div>
         {/* Detials */}
+        <div className="mt-4 flex items-center justify-between">
+          <span className="text-text-text3 w-full text-xs font-medium">
+            Avaible Balance ({base})
+            <br />
+            <span className="text-text-text0 text-xs font-medium">
+              {!userBalanceBase && "----"}
+              {(
+                Number(userBalanceBase?.balance) -
+                Number(userBalanceBase?.blocked_balance)
+              ).toLocaleString("en-US", {
+                maximumFractionDigits: precision,
+                roundingMode: "floor",
+              })}{" "}
+              {base}
+            </span>
+          </span>
+          <span className="text-text-text3 w-full text-end text-xs font-medium">
+            Avaible Balance ({quote})
+            <br />
+            <span className="text-text-text0 text-xs font-medium">
+              {!userBalanceQuote && "----"}
+              {quote === "USDT" &&
+                (
+                  Number(userBalanceQuote?.balance) -
+                  Number(userBalanceQuote?.blocked_balance)
+                ).toLocaleString("en-US", {
+                  maximumFractionDigits: precision,
+                  roundingMode: "floor",
+                })}
+              {quote === "IRT" &&
+                (
+                  Number(userBalanceQuote?.balance / 10) -
+                  Number(userBalanceQuote?.blocked_balance / 10)
+                ).toLocaleString("en-US", {
+                  maximumFractionDigits: precision,
+                  roundingMode: "floor",
+                })}{" "}
+              {quote}
+            </span>
+          </span>
+        </div>
         <div className="mt-4 flex items-center justify-between">
           <span className="text-text-text3 w-full text-xs font-medium">
             Balance ({base})

@@ -33,7 +33,6 @@ export default function FuturesOrder() {
   );
 
   const [activeTab, setActiveTab] = useState("Open Order");
-  console.log(isFetching);
 
   const orderCansleHandler = (orderID) => {
     DeleteUserOrder(userTokenSelector.token, orderID).then((res) => {

@@ -62,7 +62,7 @@ export default function Trick() {
 
   // ----------------------------------
   return (
-    <div className="flex max-w-full items-center">
+    <div className="flex h-16 max-w-full items-center">
       <div className="relative flex items-center">
         <div
           onMouseEnter={() => showMarket()}

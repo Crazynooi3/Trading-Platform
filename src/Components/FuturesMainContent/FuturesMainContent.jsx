@@ -19,19 +19,32 @@ import Trades from "../OrderBook/Trades";
 export default function FuturesMainContent() {
   const [activeTab, setActiveTab] = useState("Order Book");
   const [activeTabTrade, setActiveTabTrade] = useState("Trade");
+  const [activeChart, setActiveChart] = useState("Global Chart");
   return (
     <AggregationProvider>
       <div className="grid max-h-[750px] grid-flow-row grid-cols-12 grid-rows-8">
         <div className="col-span-8 row-span-8 min-h-0 text-white">
           {/* Trick */}
-          <div className="flex h-16 items-center pr-4 pl-2">
+          <div className="h-26 items-center">
             {/* Left */}
             <Trick />
             {/* right */}
-            <div></div>
+            <div className="border-border-border1 h-10 border-t">
+              <div className="flex h-full w-fit px-2">
+                <OrderBookTabs
+                  title={"Global Chart"}
+                  state={activeChart}
+                  setState={setActiveChart}
+                />
+                <OrderBookTabs
+                  title={"Local Chart"}
+                  state={activeChart}
+                  setState={setActiveChart}
+                />
+              </div>
+            </div>
           </div>
-
-          <Chart />
+          {activeChart === "Global Chart" && <Chart />}
         </div>
         <VolumeProvider>
           <div className="border-border-border1 col-span-2 row-span-8 min-h-0 border-l text-white">

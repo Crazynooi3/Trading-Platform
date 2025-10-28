@@ -35,6 +35,7 @@ export default function OrderPlace() {
   const [lastPrice, setLastPrice] = useState(0);
   const [isShowSizeTooltip, setIsShowTooltip] = useState(false);
   const [isShowSizeTooltipPrice, setIsShowTooltipPrice] = useState(false);
+  const [sizeUnit, setSizeUnit] = useState(base);
   const { mutate: addOrder, isPending: isAddingOrder } = useAddOrder();
 
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function OrderPlace() {
         setLastPrice(parseFloat(lastPriceStr.textContent.replace(/,/g, "")));
       }
     }
-  }, [sliderPercent]);
+  }, [sliderPercent, inputSizeValue]);
 
   const quoteIRR = Func.irtToIrr(quote);
   useEffect(() => {
@@ -78,12 +79,19 @@ export default function OrderPlace() {
   };
 
   const addUserOrderHandlerBuy = (amount, price, type, execution) => {
+    // همیشه برای buy از quote_balance استفاده کن (برای %)
+    const balance = avaibleBalanceQuote; // فیکس: حذف شرط sizeUnit، همیشه quote
+    const unit = sizeUnit === base ? "base" : "quote"; // unit فقط برای مطلق مهمه
     const trueAmount = Func.calculateVol(
       amount,
-      avaibleBalanceQuote,
+      balance,
       "buy",
       lastPrice,
+      unit,
     );
+
+    console.log(amount, balance, "buy", lastPrice, sizeUnit);
+    console.log(trueAmount);
     const truePrice = quote === "IRT" ? price * 10 : price;
 
     if (execution === "Market" && !amount) {
@@ -174,15 +182,22 @@ export default function OrderPlace() {
       );
     }
   };
-
   const addUserOrderHandlerSell = (amount, price, type, execution) => {
+    // همیشه برای buy از quote_balance استفاده کن (برای %)
+    const balance = avaibleBalanceBase; // فیکس: حذف شرط sizeUnit، همیشه quote
+    const unit = sizeUnit === base ? "base" : "quote"; // unit فقط برای مطلق مهمه
     const trueAmount = Func.calculateVol(
       amount,
-      avaibleBalanceBase,
+      balance,
       "sell",
       lastPrice,
+      unit,
     );
+
+    console.log(amount, balance, "buy", lastPrice, sizeUnit);
+    console.log(trueAmount);
     const truePrice = quote === "IRT" ? price * 10 : price;
+
     if (execution === "Market" && !amount) {
       setIsShowTooltip(true);
       return;
@@ -195,7 +210,6 @@ export default function OrderPlace() {
       setIsShowTooltipPrice(true);
       return;
     }
-
     if (execution === "Market" && amount) {
       addOrder(
         {
@@ -327,13 +341,15 @@ export default function OrderPlace() {
             />
             <OrderInput
               text="Size"
-              detail={base}
+              detail={sizeUnit}
+              dropDown={true}
               sliderPercent={sliderPercent}
               setSliderPercent={setSliderPercent}
               inputSizeValue={inputSizeValue}
               setInputSizeValue={setInputSizeValue}
               precision={precision}
               setIsShowTooltip={setIsShowTooltip}
+              setSizeUnit={setSizeUnit}
             />
           </>
         )}
@@ -347,6 +363,8 @@ export default function OrderPlace() {
             <OrderInput
               text="Price"
               detail={quote}
+              dropDown={false}
+              setSizeUnit={setSizeUnit}
               sliderPercent={sliderPercent}
               setSliderPercent={setSliderPercent}
               inputPriceValue={inputPriceValue}
@@ -362,7 +380,9 @@ export default function OrderPlace() {
             />
             <OrderInput
               text="Size"
-              detail={base}
+              detail={sizeUnit}
+              dropDown={true}
+              setSizeUnit={setSizeUnit}
               sliderPercent={sliderPercent}
               setSliderPercent={setSliderPercent}
               setInputSizeValue={setInputSizeValue}

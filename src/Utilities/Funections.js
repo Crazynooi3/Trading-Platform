@@ -121,46 +121,73 @@ export function formatTimeToTehran(createdAtStr) {
 }
 
 // برای محاسبه مقدار ورود به معامله در حالت درصد
-export function calculateVol(input, balance, side, price) {
+export function calculateVol(input, balance, side, price, unit = "quote") {
   // Coerce to numbers if strings or invalid
+  console.log(input, balance, side, price, unit);
+
   balance = typeof balance === "string" ? parseFloat(balance) : Number(balance);
   price = typeof price === "string" ? parseFloat(price) : Number(price);
 
-  // اعتبارسنجی (حالا بعد از coerce)
+  // اعتبارسنجی
   if (isNaN(balance) || balance < 0) {
-    return NaN; // به جای throw، NaN برگردون تا UI هندل کنه (مثل نمایش "خطا")
+    return NaN;
   }
   if (isNaN(price) || price <= 0) {
-    return NaN; // مشابه
+    return NaN;
   }
   if (!["buy", "sell"].includes(side)) {
     return NaN;
   }
+  if (!["base", "quote"].includes(unit)) {
+    return NaN;
+  }
+
+  // چک اینکه input درصد هست یا نه
+  const isPercentage = typeof input === "string" && input.endsWith("%");
 
   // محاسبه مقدار ورودی (درصد یا مطلق)
   let vol;
-  if (typeof input === "string" && input.endsWith("%")) {
+  if (isPercentage) {
     const percentValue = parseFloat(input.slice(0, -1));
     if (isNaN(percentValue) || percentValue < 0 || percentValue > 100) {
       return NaN;
     }
-    vol = (percentValue / 100) * balance;
+    vol = (percentValue / 100) * balance; // درصد از balance (برای buy: quote_balance, برای sell: base_balance)
   } else {
     const numericValue = parseFloat(input);
     if (isNaN(numericValue) || numericValue < 0) {
       return NaN;
     }
-    vol = numericValue;
+    vol = numericValue; // مطلق
   }
 
-  // هندل کردن بر اساس side
+  // تبدیل به base (USDT) بر اساس side، نوع input، و unit
+  let baseAmount;
   if (side === "buy") {
-    // خرید: vol (تومان) / price = USDT
-    return vol / price;
+    if (isPercentage) {
+      // برای درصد در buy: همیشه vol (IRT) / price = base
+      baseAmount = vol / price;
+    } else {
+      // مطلق در buy
+      if (unit === "quote") {
+        baseAmount = vol / price; // IRT واردشده / price
+      } else if (unit === "base") {
+        baseAmount = vol; // USDT مستقیم
+      }
+    }
   } else if (side === "sell") {
-    // فروش: vol مستقیم USDT (از موجودی base)
-    return vol;
+    if (isPercentage) {
+      // برای درصد در sell: vol (از base_balance) مستقیم base هست
+      baseAmount = vol;
+    } else {
+      // مطلق در sell
+      if (unit === "base") {
+        baseAmount = vol; // USDT فروشی مستقیم
+      } else if (unit === "quote") {
+        baseAmount = vol / price; // IRT دریافتی / price = USDT فروشی
+      }
+    }
   }
 
-  return NaN;
+  return baseAmount; // همیشه base برای API
 }

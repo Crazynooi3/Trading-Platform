@@ -5,6 +5,7 @@ import { useVolume } from "../../Utilities/Context/VolumeContext";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import usePrevious from "./../../Utilities/Hooks/usePrevious.js";
+import { useUserOrderPolling } from "../../Utilities/Hooks/useUserOrder.js";
 
 const calculateTotalVolume = (price, volume) => (price / 10) * volume;
 
@@ -82,7 +83,16 @@ export default function OrderBook() {
   const { rDepth, rPriceAg, currentSymbol } = useSelector(
     (state) => state.webSocketMessage,
   );
+  const userTokenSelector = useSelector((state) => state.userToken);
   const dispatch = useDispatch();
+  const {
+    data: pendingOrder,
+    isLoading,
+    error,
+    refetch,
+  } = useUserOrderPolling(userTokenSelector.token, "PENDING");
+  // console.log(pendingOrder);
+
   // -------------------------------------
   const [bidOrders, setBidOrders] = useState([]);
   const [askOrders, setAskOrders] = useState([]);
@@ -294,6 +304,107 @@ export default function OrderBook() {
     setTotalVolumes({ ask: totalVolumeAsk, bid: totalVolumeBid });
   }, [totalVolumeAsk, totalVolumeBid, setTotalVolumes]);
 
+  // Helper برای پیدا کردن indices سطوح ask که pending sell orders در اون‌ها قرار می‌گیرن
+  const getPendingOrderIndicesAsk = () => {
+    const indices = new Set();
+    let orders = [];
+    if (pendingOrder) {
+      if (Array.isArray(pendingOrder)) {
+        orders = pendingOrder;
+      } else if (Array.isArray(pendingOrder.data)) {
+        orders = pendingOrder.data; // اگر nested
+      }
+    }
+    if (!orders.length || isLoading || !askOrdersAggregated.length) {
+      return indices;
+    }
+
+    // فقط sell pending matching symbol
+    const relevantOrders = orders.filter(
+      (order) =>
+        order.type === "sell" &&
+        order.status === "PENDING" &&
+        order.market?.id === symbolID,
+    );
+
+    relevantOrders.forEach((order) => {
+      const pendingPrice = parseFloat(order.price);
+      if (isNaN(pendingPrice)) return;
+
+      // فیکس جدید: پیدا کردن بزرگ‌ترین ask price <= pendingPrice (نزدیک‌ترین پایین‌تر یا مساوی)
+      let matchedIndex = -1;
+      let maxAskBelow = -Infinity; // برای track max <= P
+      for (let i = 0; i < askOrdersAggregated.length; i++) {
+        const askPrice = askOrdersAggregated[i][0]; // price raw
+        if (askPrice <= pendingPrice && askPrice > maxAskBelow) {
+          maxAskBelow = askPrice;
+          matchedIndex = i;
+        }
+      }
+
+      // فقط اگر match پیدا شد (در محدوده <= P)، index رو اضافه کن
+      if (matchedIndex >= 0) {
+        indices.add(matchedIndex);
+        // دیباگ: console.log(`Matched pending ${pendingPrice} to ask index ${matchedIndex} (price: ${askOrdersAggregated[matchedIndex][0]})`);
+      } else {
+        // دیباگ: console.log(`Pending ${pendingPrice} out of ask range (no ask <= ${pendingPrice}, min ask: ${askOrdersAggregated[0]?.[0]}) – no dot`);
+      }
+    });
+
+    return indices;
+  };
+
+  // Helper برای پیدا کردن indices سطوح bid که pending buy orders در اون‌ها قرار می‌گیرن
+  const getPendingOrderIndicesBid = () => {
+    const indices = new Set();
+    let orders = [];
+    if (pendingOrder) {
+      if (Array.isArray(pendingOrder)) {
+        orders = pendingOrder;
+      } else if (Array.isArray(pendingOrder.data)) {
+        orders = pendingOrder.data; // اگر nested
+      }
+    }
+    if (!orders.length || isLoading || !bidOrdersAggregated.length) {
+      return indices;
+    }
+
+    // فقط buy pending matching symbol
+    const relevantOrders = orders.filter(
+      (order) =>
+        order.type === "buy" &&
+        order.status === "PENDING" &&
+        order.market?.id === symbolID,
+    );
+
+    relevantOrders.forEach((order) => {
+      const pendingPrice = parseFloat(order.price);
+      if (isNaN(pendingPrice)) return;
+
+      // پیدا کردن بزرگ‌ترین bid price <= pendingPrice (نزدیک‌ترین پایین‌تر یا مساوی)
+      let matchedIndex = -1;
+      let maxBidBelow = -Infinity; // برای track max <= P
+      for (let i = 0; i < bidOrdersAggregated.length; i++) {
+        const bidPrice = bidOrdersAggregated[i][0]; // price raw
+        if (bidPrice <= pendingPrice && bidPrice > maxBidBelow) {
+          maxBidBelow = bidPrice;
+          matchedIndex = i;
+        }
+      }
+
+      // فقط اگر match پیدا شد (در محدوده <= P)، index رو اضافه کن
+      if (matchedIndex >= 0) {
+        indices.add(matchedIndex);
+        // دیباگ: console.log(`Matched pending buy ${pendingPrice} to bid index ${matchedIndex} (price: ${bidOrdersAggregated[matchedIndex][0]})`);
+      } else {
+        // دیباگ: console.log(`Pending buy ${pendingPrice} out of bid range (no bid <= ${pendingPrice}, max bid: ${bidOrdersAggregated[0]?.[0]}) – no dot`);
+      }
+    });
+
+    return indices;
+  };
+  const pendingIndices = getPendingOrderIndicesAsk();
+  const pendingIndicesBid = getPendingOrderIndicesBid();
   return (
     <>
       <div className="mt-1 h-[calc(100%-9.2rem)]">
@@ -368,7 +479,7 @@ export default function OrderBook() {
                 maxTotalVolumeAsk > 0
                   ? (totalVolume / maxTotalVolumeAsk) * 100
                   : 0;
-
+              const showUserOrderDot = pendingIndices.has(index);
               return (
                 <li
                   key={index}
@@ -400,6 +511,9 @@ export default function OrderBook() {
                   <span
                     className="bg-danger-danger4 absolute right-0 -z-10 h-[calc(100%-2px)] transition-all duration-500"
                     style={{ width: `${percentage}%` }}></span>
+                  {showUserOrderDot && (
+                    <span className="absolute left-1 h-1 w-1 rounded-full bg-amber-400"></span>
+                  )}
                 </li>
               );
             })}
@@ -495,6 +609,7 @@ export default function OrderBook() {
                   ? (totalVolume / maxTotalVolumeBid) * 100
                   : 0;
 
+              const showUserOrderDot = pendingIndicesBid.has(index);
               return (
                 <li
                   onMouseEnter={() => {
@@ -529,6 +644,9 @@ export default function OrderBook() {
                   <span
                     className="bg-success-success4 absolute right-0 -z-10 h-[calc(100%-2px)] transition-all duration-500"
                     style={{ width: `${percentage}%` }}></span>
+                  {showUserOrderDot && (
+                    <span className="absolute left-1 h-1 w-1 rounded-full bg-amber-400"></span>
+                  )}
                 </li>
               );
             })}

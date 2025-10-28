@@ -17,7 +17,6 @@ export default function OrderPlace() {
   const { symbolID, precision } = useSelector(
     (state) => state.symbolIDPrecision,
   );
-  const [currentOrderId, setCurrentOrderId] = useState(null);
   const userTokenSelector = useSelector((state) => state.userToken);
   const { base, quote } = useParams();
   const userWalletSelector = useSelector((state) => state.userWallet);
@@ -79,9 +78,8 @@ export default function OrderPlace() {
   };
 
   const addUserOrderHandlerBuy = (amount, price, type, execution) => {
-    // همیشه برای buy از quote_balance استفاده کن (برای %)
-    const balance = avaibleBalanceQuote; // فیکس: حذف شرط sizeUnit، همیشه quote
-    const unit = sizeUnit === base ? "base" : "quote"; // unit فقط برای مطلق مهمه
+    const balance = avaibleBalanceQuote;
+    const unit = sizeUnit === base ? "base" : "quote";
     const trueAmount = Func.calculateVol(
       amount,
       balance,
@@ -90,8 +88,6 @@ export default function OrderPlace() {
       unit,
     );
 
-    console.log(amount, balance, "buy", lastPrice, sizeUnit);
-    console.log(trueAmount);
     const truePrice = quote === "IRT" ? price * 10 : price;
 
     if (execution === "Market" && !amount) {
@@ -118,7 +114,6 @@ export default function OrderPlace() {
         {
           onSuccess: (response) => {
             const orderId = response.data.id;
-            setCurrentOrderId(orderId);
             dispatch(getUserWallet(userTokenSelector.token));
             toast.success("سفارش خرید مارکت با موفقیت ثبت شد", {
               position: "top-center",
@@ -155,7 +150,6 @@ export default function OrderPlace() {
         {
           onSuccess: (response) => {
             const orderId = response.data.id;
-            setCurrentOrderId(orderId);
             dispatch(getUserWallet(userTokenSelector.token));
             toast.success("سفارش خرید لیمیت با موفقیت ثبت شد", {
               position: "top-center",
@@ -183,9 +177,8 @@ export default function OrderPlace() {
     }
   };
   const addUserOrderHandlerSell = (amount, price, type, execution) => {
-    // همیشه برای buy از quote_balance استفاده کن (برای %)
-    const balance = avaibleBalanceBase; // فیکس: حذف شرط sizeUnit، همیشه quote
-    const unit = sizeUnit === base ? "base" : "quote"; // unit فقط برای مطلق مهمه
+    const balance = avaibleBalanceBase;
+    const unit = sizeUnit === base ? "base" : "quote";
     const trueAmount = Func.calculateVol(
       amount,
       balance,
@@ -193,9 +186,6 @@ export default function OrderPlace() {
       lastPrice,
       unit,
     );
-
-    console.log(amount, balance, "buy", lastPrice, sizeUnit);
-    console.log(trueAmount);
     const truePrice = quote === "IRT" ? price * 10 : price;
 
     if (execution === "Market" && !amount) {
@@ -222,7 +212,6 @@ export default function OrderPlace() {
         {
           onSuccess: (response) => {
             const orderId = response.data.id;
-            setCurrentOrderId(orderId);
             dispatch(getUserWallet(userTokenSelector.token));
             toast.success("سفارش فروش مارکت با موفقیت ثبت شد", {
               position: "top-center",
@@ -259,7 +248,6 @@ export default function OrderPlace() {
         {
           onSuccess: (response) => {
             const orderId = response.data.id;
-            setCurrentOrderId(orderId);
             dispatch(getUserWallet(userTokenSelector.token));
             toast.success("سفارش فروش لیمیت با موفقیت ثبت شد", {
               position: "top-center",

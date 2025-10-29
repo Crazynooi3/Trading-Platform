@@ -22,7 +22,7 @@ const Chart = () => {
             theme: "dark",
             symbol: `${base}${correctQuote()}`,
             interval: "1H",
-            height: "100%",
+            height: "90%",
           }}
         />
         <style jsx>{`

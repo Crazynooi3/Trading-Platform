@@ -16,6 +16,7 @@ import Trick from "../Trick/Trick";
 import ShortLongTrigger from "../Chart/ShortLongTrigger";
 import { AggregationProvider } from "../../Utilities/Context/AggregationContext";
 import Trades from "../OrderBook/Trades";
+import LocalChart from "../Chart/localChart";
 export default function FuturesMainContent() {
   const [activeTab, setActiveTab] = useState("Order Book");
   const [activeTabTrade, setActiveTabTrade] = useState("Trade");
@@ -45,6 +46,7 @@ export default function FuturesMainContent() {
             </div>
           </div>
           {activeChart === "Global Chart" && <Chart />}
+          {activeChart === "Local Chart" && <LocalChart />}
         </div>
         <VolumeProvider>
           <div className="border-border-border1 col-span-2 row-span-8 min-h-0 border-l text-white">

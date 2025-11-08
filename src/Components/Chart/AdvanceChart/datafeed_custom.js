@@ -115,7 +115,7 @@ class RealTimeManager {
     fetchData();
 
     // تنظیم interval
-    const interval = setInterval(fetchData, 10000);
+    const interval = setInterval(fetchData, 1000);
 
     this.subscriptions.set(subscribeUID, {
       symbol,

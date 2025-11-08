@@ -17,10 +17,12 @@ import ShortLongTrigger from "../Chart/ShortLongTrigger";
 import { AggregationProvider } from "../../Utilities/Context/AggregationContext";
 import Trades from "../OrderBook/Trades";
 import LocalChart from "../Chart/localChart";
+import TVChartContainer from "../Chart/AdvanceChart/advanced_chart";
+
 export default function FuturesMainContent() {
   const [activeTab, setActiveTab] = useState("Order Book");
   const [activeTabTrade, setActiveTabTrade] = useState("Trade");
-  const [activeChart, setActiveChart] = useState("Global Chart");
+  const [activeChart, setActiveChart] = useState("Local Chart");
   return (
     <AggregationProvider>
       <div className="grid max-h-[750px] grid-flow-row grid-cols-12 grid-rows-8">
@@ -46,7 +48,7 @@ export default function FuturesMainContent() {
             </div>
           </div>
           {activeChart === "Global Chart" && <Chart />}
-          {activeChart === "Local Chart" && <LocalChart />}
+          {activeChart === "Local Chart" && <TVChartContainer />}
         </div>
         <VolumeProvider>
           <div className="border-border-border1 col-span-2 row-span-8 min-h-0 border-l text-white">

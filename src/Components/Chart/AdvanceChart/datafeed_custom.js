@@ -95,15 +95,9 @@ class RealTimeManager {
               close: currentClose,
               volume: bars.v[lastIndex],
             };
-
             onRealtimeCallback(latestBar);
             this.lastPrices.set(symbol, currentClose); // ذخیره قیمت جدید
-
-            console.log(
-              `🔄 قیمت تغییر کرد: ${symbol} از ${lastClose} به ${currentClose}`,
-            );
           } else {
-            console.log(`⏸️ قیمت تغییر نکرده: ${symbol} - ${currentClose}`);
           }
         }
       } catch (error) {

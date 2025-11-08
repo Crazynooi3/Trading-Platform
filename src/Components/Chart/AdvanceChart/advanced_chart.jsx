@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-
 import { widget } from "./charting_library";
 import Datafeed from "./datafeed_custom";
 
@@ -36,7 +35,6 @@ const TVChartContainer = () => {
       overrides: {
         "mainSeriesProperties.statusViewStyle.showInterval": true,
         "mainSeriesProperties.statusViewStyle.symbolTextSource": "ticker",
-        "paneProperties.background": "#101112",
       },
     };
 

@@ -2557,6 +2557,22 @@ html.theme-dark .tv-control-input[disabled] {
 .tv-control-input[disabled]::-ms-input-placeholder {
   color: #e0e3eb !important;
 }
+.tv-control-input.i-disabled::-webkit-input-placeholder,
+.tv-control-input[disabled]::-webkit-input-placeholder {
+  color: #e0e3eb !important;
+}
+.tv-control-input.i-disabled::-moz-placeholder,
+.tv-control-input[disabled]::-moz-placeholder {
+  color: #e0e3eb !important;
+}
+.tv-control-input.i-disabled:-ms-input-placeholder,
+.tv-control-input[disabled]:-ms-input-placeholder {
+  color: #e0e3eb !important;
+}
+.tv-control-input.i-disabled::-ms-input-placeholder,
+.tv-control-input[disabled]::-ms-input-placeholder {
+  color: #e0e3eb !important;
+}
 .tv-control-input.i-disabled::-webkit-input-placeholder, .tv-control-input[disabled]::-webkit-input-placeholder {
   color: #e0e3eb !important;
 }
@@ -2572,6 +2588,22 @@ html.theme-dark .tv-control-input[disabled] {
 .tv-control-input.i-disabled::placeholder,
 .tv-control-input[disabled]::placeholder {
   color: #e0e3eb !important;
+}
+html.theme-dark .tv-control-input.i-disabled::-webkit-input-placeholder,
+html.theme-dark .tv-control-input[disabled]::-webkit-input-placeholder {
+  color: #2a2e39 !important;
+}
+html.theme-dark .tv-control-input.i-disabled::-moz-placeholder,
+html.theme-dark .tv-control-input[disabled]::-moz-placeholder {
+  color: #2a2e39 !important;
+}
+html.theme-dark .tv-control-input.i-disabled:-ms-input-placeholder,
+html.theme-dark .tv-control-input[disabled]:-ms-input-placeholder {
+  color: #2a2e39 !important;
+}
+html.theme-dark .tv-control-input.i-disabled::-ms-input-placeholder,
+html.theme-dark .tv-control-input[disabled]::-ms-input-placeholder {
+  color: #2a2e39 !important;
 }
 html.theme-dark .tv-control-input.i-disabled::-webkit-input-placeholder,
 html.theme-dark .tv-control-input[disabled]::-webkit-input-placeholder {

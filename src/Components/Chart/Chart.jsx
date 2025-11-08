@@ -15,14 +15,13 @@ const Chart = () => {
 
   return (
     <>
-      {/* {console.log("chart")} */}
       <div className="custom-height h-[calc(100vh-64px)]">
         <AdvancedChart
           widgetProps={{
             theme: "dark",
             symbol: `${base}${correctQuote()}`,
             interval: "1H",
-            height: "90%",
+            height: "100%",
           }}
         />
         <style jsx>{`

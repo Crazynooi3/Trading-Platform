@@ -1,4 +1,5 @@
-import { getBars, getBarsDirect } from "./getBars";
+import { useSmartChartData } from "./../../../Utilities/Hooks/useChartData";
+import { getBarsDirect } from "./getBars";
 
 export const configurationData = {
   supported_resolutions: ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"],
@@ -63,16 +64,16 @@ export const symbols = {
   },
 };
 
-// 🔄 مدیریت real-time subscriptions
+// 🔄 مدیریت real-time subscriptions با React Query
 class RealTimeManager {
   constructor() {
     this.subscriptions = new Map();
+    this.lastPrices = new Map(); // ذخیره آخرین قیمت‌ها
   }
 
   subscribe(subscribeUID, symbol, resolution, onRealtimeCallback) {
     this.unsubscribe(subscribeUID);
 
-    // استفاده از React Query برای real-time data
     const fetchData = async () => {
       try {
         const to = Math.floor(Date.now() / 1000);
@@ -81,26 +82,40 @@ class RealTimeManager {
 
         if (bars && bars.t && bars.t.length > 0) {
           const lastIndex = bars.t.length - 1;
-          const latestBar = {
-            time: bars.t[lastIndex] * 1000,
-            open: bars.o[lastIndex],
-            high: bars.h[lastIndex],
-            low: bars.l[lastIndex],
-            close: bars.c[lastIndex],
-            volume: bars.v[lastIndex],
-          };
-          onRealtimeCallback(latestBar);
+          const currentClose = bars.c[lastIndex];
+          const lastClose = this.lastPrices.get(symbol);
+
+          // فقط اگر قیمت تغییر کرده باشه
+          if (currentClose !== lastClose) {
+            const latestBar = {
+              time: bars.t[lastIndex] * 1000,
+              open: bars.o[lastIndex],
+              high: bars.h[lastIndex],
+              low: bars.l[lastIndex],
+              close: currentClose,
+              volume: bars.v[lastIndex],
+            };
+
+            onRealtimeCallback(latestBar);
+            this.lastPrices.set(symbol, currentClose); // ذخیره قیمت جدید
+
+            console.log(
+              `🔄 قیمت تغییر کرد: ${symbol} از ${lastClose} به ${currentClose}`,
+            );
+          } else {
+            console.log(`⏸️ قیمت تغییر نکرده: ${symbol} - ${currentClose}`);
+          }
         }
       } catch (error) {
         console.error(`❌ Real-time error for ${symbol}:`, error);
       }
     };
 
-    // اولین بار
+    // اولین بار همیشه اجرا میشه
     fetchData();
 
     // تنظیم interval
-    const interval = setInterval(fetchData, 10000); // هر 10 ثانیه
+    const interval = setInterval(fetchData, 10000);
 
     this.subscriptions.set(subscribeUID, {
       symbol,
@@ -115,13 +130,25 @@ class RealTimeManager {
       const subscription = this.subscriptions.get(subscribeUID);
       clearInterval(subscription.interval);
       this.subscriptions.delete(subscribeUID);
+      this.refetchTriggers.delete(subscribeUID);
+    }
+  }
+
+  // تابع برای trigger کردن refetch یک subscription خاص
+  triggerRefetch(subscribeUID) {
+    if (this.refetchTriggers.has(subscribeUID)) {
+      this.refetchTriggers.set(
+        subscribeUID,
+        !this.refetchTriggers.get(subscribeUID),
+      );
     }
   }
 }
 
 const realTimeManager = new RealTimeManager();
 
-export const datafeed = {
+// کامپوننت wrapper برای استفاده از هوک در datafeed
+export const DatafeedWithReactQuery = {
   onReady: (callback) => {
     setTimeout(() => callback(configurationData), 0);
   },
@@ -162,6 +189,8 @@ export const datafeed = {
   ) => {
     try {
       const { from, to } = periodParams;
+
+      // استفاده از تابع مستقیم برای داده‌های تاریخی
       const bars = await getBarsDirect(symbolInfo.symbol, resolution, from, to);
 
       if (bars && bars.t && bars.t.length > 0) {
@@ -217,4 +246,6 @@ export const datafeed = {
   },
 };
 
-export default datafeed;
+// برای backward compatibility
+export const datafeed = DatafeedWithReactQuery;
+export default DatafeedWithReactQuery;

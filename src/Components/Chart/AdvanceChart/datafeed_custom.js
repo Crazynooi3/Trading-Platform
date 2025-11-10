@@ -1,5 +1,6 @@
 import { useSmartChartData } from "./../../../Utilities/Hooks/useChartData";
 import { getBarsDirect } from "./getBars";
+import PersianDate from "persian-date";
 
 export const configurationData = {
   supported_resolutions: ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"],
@@ -17,7 +18,7 @@ export const configurationData = {
   ],
   supports_search: true,
   supports_group_request: false,
-  supports_marks: false,
+  supports_marks: true,
   supports_timescale_marks: false,
   supports_time: true,
   supports_realtime: true,
@@ -63,12 +64,23 @@ export const symbols = {
     data_status: "streaming",
   },
 };
+let userHistory = [];
+export const setUserHistory = (history) => {
+  userHistory = history;
+};
 
-// 🔄 مدیریت real-time subscriptions با React Query
+function toEnglishDigits(str) {
+  const persianDigits = "۰۱۲۳۴۵۶۷۸۹";
+  const englishDigits = "0123456789";
+  return str.replace(/[۰-۹]/g, function (char) {
+    return englishDigits[persianDigits.indexOf(char)];
+  });
+}
 class RealTimeManager {
   constructor() {
     this.subscriptions = new Map();
     this.lastPrices = new Map(); // ذخیره آخرین قیمت‌ها
+    this.refetchTriggers = new Map(); // فیکس: تعریف در constructor
   }
 
   subscribe(subscribeUID, symbol, resolution, onRealtimeCallback) {
@@ -231,7 +243,49 @@ export const DatafeedWithReactQuery = {
       : undefined;
   },
 
-  getMarks: () => {},
+  getMarks: (symbolInfo, from, to, onDataCallback, resolution) => {
+    try {
+      // فیلتر history در range from/to (trade.time ثانیه، from/to ثانیه)
+      const filteredHistory = userHistory
+        .filter((trade) => trade.time >= from && trade.time <= to)
+        .map((trade, index) => {
+          let color, shape, position, tooltipText, label;
+          const isBuy =
+            trade.type.toLowerCase() === "buy" ||
+            (trade.type.toLowerCase() === "long" && trade.isEntry);
+          console.log(
+            `Trade type: ${trade.type}, isEntry: ${trade.isEntry}, isBuy: ${isBuy}`,
+          ); // دیباگ: چک isBuy for position
+          if (isBuy) {
+            color = "green";
+            const pd = new PersianDate(trade.time * 1000);
+            tooltipText = `Buy Entry at ${trade.price.toLocaleString()} on ${toEnglishDigits(pd.format("YYYY-MM-DD HH:mm:ss"))}`;
+            label = "B";
+          } else {
+            color = "red";
+            const pd = new PersianDate(trade.time * 1000);
+            tooltipText = `Sell Entry at ${trade.price.toLocaleString()} on ${toEnglishDigits(pd.format("YYYY-MM-DD HH:mm:ss"))}`;
+            label = "S"; // متن داخل circle
+          }
+
+          return {
+            id: `mark-${symbolInfo.symbol}-${index}`, // unique id
+            time: trade.time, // ثانیه
+            color: color, // فیکس: name رنگ
+            label: label, // متن داخل circle (B/S)
+            text: [tooltipText], // tooltip hover
+            minSize: 16,
+            labelFontColor: "#FFFFFF", // سفید برای خوانایی
+          };
+        });
+
+      console.log("Filtered history:", filteredHistory); // دیباگ: چک position/color
+      onDataCallback(filteredHistory);
+    } catch (error) {
+      console.error("[Datafeed] خطا در getMarks:", error);
+      onDataCallback([]);
+    }
+  },
 
   getTimescaleMarks: () => {},
 

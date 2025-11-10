@@ -16,6 +16,7 @@
     "antd": "^5.27.6",
     "axios": "^1.13.1",
     "lightweight-charts": "^5.0.9",
+    "persian-date": "^1.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-redux": "^9.2.0",

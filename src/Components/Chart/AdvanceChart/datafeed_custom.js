@@ -253,9 +253,6 @@ export const DatafeedWithReactQuery = {
           const isBuy =
             trade.type.toLowerCase() === "buy" ||
             (trade.type.toLowerCase() === "long" && trade.isEntry);
-          console.log(
-            `Trade type: ${trade.type}, isEntry: ${trade.isEntry}, isBuy: ${isBuy}`,
-          ); // دیباگ: چک isBuy for position
           if (isBuy) {
             color = "green";
             const pd = new PersianDate(trade.time * 1000);
@@ -278,8 +275,6 @@ export const DatafeedWithReactQuery = {
             labelFontColor: "#FFFFFF", // سفید برای خوانایی
           };
         });
-
-      console.log("Filtered history:", filteredHistory); // دیباگ: چک position/color
       onDataCallback(filteredHistory);
     } catch (error) {
       console.error("[Datafeed] خطا در getMarks:", error);

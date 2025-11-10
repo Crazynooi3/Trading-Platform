@@ -1,14 +1,115 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { widget } from "./charting_library";
 import Datafeed, { setUserHistory } from "./datafeed_custom";
+import { useSelector } from "react-redux";
+import { useUserOrderPolling } from "../../../Utilities/Hooks/useUserOrder";
 
 const TVChartContainer = () => {
   const chartContainerRef = useRef();
+  const tvWidgetRef = useRef(null);
+  const chartRef = useRef(null);
+  const userTokenSelector = useSelector((state) => state.userToken);
+  const {
+    data: pendingOrder,
+    isLoading,
+    error,
+    refetch,
+  } = useUserOrderPolling(userTokenSelector.token, "PENDING");
 
+  // ---------React State----------
+  const [userPositions, setUserPositions] = useState([]); // حفظ‌شده از کد اولیه
+  const [positionLines, setPositionLines] = useState([]); // اضافه برای track/cleanup lines
+
+  // ---------Helper Func----------
+  const buildUserPositions = useCallback((orders, symbol) => {
+    if (!orders || !symbol) return [];
+    const baseCurrency = symbol.slice(0, -3);
+    const quoteCurrency = symbol.slice(-3);
+    return orders
+      .filter(
+        (order) =>
+          order.status === "PENDING" &&
+          order.market.base_currency.id === baseCurrency &&
+          order.market.quote_currency.id === quoteCurrency,
+      )
+      .map((order) => {
+        const posType = order.type.toLowerCase() === "buy" ? "long" : "short";
+        const timestamp = new Date(order.created_at).getTime(); // ms
+        const size = parseFloat(order.amount); // حجم
+        const price =
+          order.market.quote_currency.id === "IRR"
+            ? parseFloat(order.price) / 10
+            : parseFloat(order.price);
+        return {
+          time: timestamp,
+          price: price,
+          type: posType,
+          size: size,
+        };
+      });
+  }, []);
+  // ---------Use Effect update positions from pendingOrder (حفظ‌شده از کد اولیه) ----------
   useEffect(() => {
-    localStorage.removeItem("tradingview.chartproperties");
-    localStorage.removeItem("tradingview.chartsettings");
-    sessionStorage.removeItem("tradingview.*");
+    if (pendingOrder?.data && !isLoading) {
+      const currentSymbol = "USDTIRR";
+      const positions = buildUserPositions(pendingOrder.data, currentSymbol);
+      setUserPositions(positions);
+    } else if (error) {
+      console.error("Error fetching pending orders:", error);
+      setUserPositions([]);
+    }
+  }, [pendingOrder, isLoading, error, buildUserPositions]);
+
+  // ---------useEffect update positions----------
+  useEffect(() => {
+    if (!chartRef.current) {
+      return;
+    }
+    positionLines.forEach((line) => line.remove());
+    setPositionLines([]);
+
+    const newPositionLines = [];
+    userPositions.forEach((pos) => {
+      const posType = pos.type.toLowerCase();
+      const quantityStr =
+        posType === "short" ? "-" + pos.size : pos.size.toString();
+
+      const positionLine = chartRef.current.createPositionLine();
+
+      if (posType === "long") {
+        positionLine
+          .setText("Buy Order @ " + Number(pos.price).toLocaleString("en-US"))
+          .setQuantity(quantityStr)
+          .setPrice(pos.price)
+          .setBodyBackgroundColor("#48da63")
+          .setBodyBorderColor("#40404000")
+          .setBodyTextColor("#000")
+          .setLineColor("#48da63")
+          .setQuantityBackgroundColor("rgba(0,255,0,0.5)")
+          .setQuantityBorderColor("#40404000")
+          .setLineWidth(0.5)
+          .setLineStyle(2);
+      } else if (posType === "short") {
+        positionLine
+          .setText("Sell Order @ " + Number(pos.price).toLocaleString("en-US"))
+          .setQuantity(quantityStr)
+          .setPrice(pos.price)
+          .setBodyBackgroundColor("#da4848")
+          .setBodyBorderColor("#40404000")
+          .setBodyTextColor("#000")
+          .setLineColor("#FF0000")
+          .setQuantityBackgroundColor("rgba(255,0,0,0.5)")
+          .setQuantityBorderColor("#40404000")
+          .setLineWidth(0.5)
+          .setLineStyle(2);
+      }
+      newPositionLines.push(positionLine);
+    });
+    setPositionLines(newPositionLines);
+  }, [userPositions, chartRef.current]); // وابستگی‌ها: positions و chart (positionLines رو اضافه نکردم تا loop نشه)
+
+  // ---------Use Effect Create Chart ----------
+  useEffect(() => {
     const widgetOptions = {
       symbol: "USDTIRT",
       datafeed: Datafeed,
@@ -42,31 +143,13 @@ const TVChartContainer = () => {
     };
 
     const tvWidget = new widget(widgetOptions);
-
-    // فرض: positions کاربر (از API بگیر)
-    const userPositions = [
-      {
-        time: 1731091200000, // timestamp ورود (میلی‌ثانیه)
-        price: 108000, // قیمت ورود
-        type: "long", // یا "short"
-        size: 150, // حجم
-      },
-      {
-        time: 1731081200000, // timestamp ورود (میلی‌ثانیه)
-        price: 109000, // قیمت ورود
-        type: "Short", // یا "short"
-        size: 1, // حجم
-      },
-      // ... positions دیگه
-    ];
-
-    // History معاملات بسته‌شده (فرض: از API بگیر – entry/exit points)
+    tvWidgetRef.current = tvWidget;
     const userHistory = [
       {
-        time: 1762502560, // timestamp معامله (ثانیه – فیکس filter)
+        time: 1762502560,
         price: 108000,
-        type: "buy", // یا "sell" / "long" / "short"
-        isEntry: true, // true برای entry، false برای exit
+        type: "buy",
+        isEntry: true,
       },
       {
         time: 1762509760,
@@ -76,51 +159,18 @@ const TVChartContainer = () => {
       },
       // ... history دیگه
     ];
-    setUserHistory(userHistory); // پاس به datafeed
+    setUserHistory(userHistory);
     tvWidget.onChartReady(() => {
       const chart = tvWidget.activeChart();
-
-      // Positions باز (مثل قبل، با فیکس‌های تو)
-      userPositions.forEach((pos) => {
-        const posType = pos.type.toLowerCase(); // normalize type
-        const quantityStr =
-          posType === "short" ? "-" + pos.size : pos.size.toString(); // منفی برای short
-        const positionLine = chart.createPositionLine(); // ایجاد خط پوزیشن
-
-        if (posType === "long") {
-          positionLine
-            .setText("Buy Order @ " + Number(pos.price).toLocaleString("en-US"))
-            .setQuantity(quantityStr)
-            .setPrice(pos.price)
-            .setBodyBackgroundColor("#48da63")
-            .setBodyBorderColor("#40404000")
-            .setBodyTextColor("#000")
-            .setLineColor("#48da63")
-            .setQuantityBackgroundColor("rgba(0,255,0,0.5)")
-            .setQuantityBorderColor("#40404000")
-            .setLineWidth(0.5)
-            .setLineStyle(2);
-        } else if (posType === "short") {
-          positionLine
-            .setText(
-              "Sell Order @ " + Number(pos.price).toLocaleString("en-US"),
-            )
-            .setQuantity(quantityStr)
-            .setPrice(pos.price)
-            .setBodyBackgroundColor("#da4848")
-            .setBodyBorderColor("#40404000")
-            .setBodyTextColor("#000")
-            .setLineColor("#FF0000")
-            .setQuantityBackgroundColor("rgba(255,0,0,0.5)")
-            .setQuantityBorderColor("#40404000")
-            .setLineWidth(0.5)
-            .setLineStyle(2);
-        }
-      });
+      chartRef.current = chart;
     });
 
     return () => {
+      positionLines.forEach((line) => line.remove());
+      setPositionLines([]);
       tvWidget.remove();
+      tvWidgetRef.current = null;
+      chartRef.current = null;
     };
   }, []);
 

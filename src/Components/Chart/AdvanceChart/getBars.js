@@ -1,11 +1,7 @@
 import axios from "axios";
 import { useChartData } from "./../../../Utilities/Hooks/useChartData";
 
-// این تابع برای backward compatibility با datafeed قدیمی
-// توجه: این تابع دیگه async نیست و از هوک استفاده میکنه
 export const getBars = (symbol, resolution, from, to) => {
-  // از هوک استفاده میکنیم اما باید دیتا رو return کنیم
-  // این یک wrapper برای compatibility با کد قدیمیه
   const { data, isLoading, error } = useChartData(symbol, resolution, from, to);
 
   if (isLoading) return null;
@@ -16,7 +12,6 @@ export const getBars = (symbol, resolution, from, to) => {
   return data;
 };
 
-// تابع اصلی برای استفاده در datafeed (بدون هوک)
 export const getBarsDirect = async (symbol, resolution, from, to) => {
   try {
     const PROXY_URL = "http://localhost:3001/api/ompfinex";

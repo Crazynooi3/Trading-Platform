@@ -1,4 +1,4 @@
-import { useSmartChartData } from "./../../../Utilities/Hooks/useChartData";
+import { useSelector } from "react-redux";
 import { getBarsDirect } from "./getBars";
 import PersianDate from "persian-date";
 
@@ -24,7 +24,42 @@ export const configurationData = {
   supports_realtime: true,
 };
 
-export const symbols = {
+// تابع برای ساخت symbols از داده‌های marketsData
+const buildSymbols = (marketsData) => {
+  return marketsData.reduce((acc, market) => {
+    // فقط بازارهایی که quote_currency.id === 'IRR' هستن رو در نظر بگیر
+    if (market.quote_currency.id !== "IRR") return acc;
+
+    const baseId = market.base_currency.id;
+    const symbolKey = `${baseId}IRT`; // همیشه IRT برای تومان
+    const baseEnglishName = market.base_currency.currency_name?.en || baseId; // از en استفاده کن
+
+    acc[symbolKey] = {
+      symbol: symbolKey,
+      ticker: symbolKey,
+      name: `${baseId}/IRT`,
+      description: `${baseEnglishName} to Iranian Toman`,
+      type: "crypto",
+      session: "24x7",
+      exchange: "Ompfinex",
+      listed_exchange: "Ompfinex",
+      timezone: "Asia/Tehran",
+      minmov: 1,
+      pricescale: 100, // می‌تونی بر اساس quote_currency_precision تنظیم کنی، مثلاً Math.pow(10, market.quote_currency_precision)
+      has_intraday: true,
+      has_daily: true,
+      has_weekly_and_monthly: true,
+      supported_resolutions: configurationData.supported_resolutions,
+      volume_precision: 2,
+      data_status: "streaming",
+    };
+
+    return acc;
+  }, {});
+};
+
+// symbols اولیه (هاردکد شده برای fallback، بعداً با setSymbolsFromRedux آپدیت می‌شه)
+let currentSymbols = {
   USDTIRT: {
     symbol: "USDTIRT",
     ticker: "USDTIRT",
@@ -64,6 +99,14 @@ export const symbols = {
     data_status: "streaming",
   },
 };
+
+// فانکشن برای آپدیت symbols از Redux (در کامپوننت React فراخوانی کن)
+export const setSymbolsFromRedux = (marketsData) => {
+  if (marketsData?.data && !marketsData.loading && !marketsData.error) {
+    currentSymbols = buildSymbols(marketsData.data);
+  }
+};
+
 let userHistory = [];
 export const setUserHistory = (history) => {
   userHistory = history;
@@ -80,7 +123,7 @@ class RealTimeManager {
   constructor() {
     this.subscriptions = new Map();
     this.lastPrices = new Map(); // ذخیره آخرین قیمت‌ها
-    this.refetchTriggers = new Map(); // فیکس: تعریف در constructor
+    this.refetchTriggers = new Map();
   }
 
   subscribe(subscribeUID, symbol, resolution, onRealtimeCallback) {
@@ -108,7 +151,7 @@ class RealTimeManager {
               volume: bars.v[lastIndex],
             };
             onRealtimeCallback(latestBar);
-            this.lastPrices.set(symbol, currentClose); // ذخیره قیمت جدید
+            this.lastPrices.set(symbol, currentClose);
           } else {
           }
         }
@@ -117,10 +160,7 @@ class RealTimeManager {
       }
     };
 
-    // اولین بار همیشه اجرا میشه
     fetchData();
-
-    // تنظیم interval
     const interval = setInterval(fetchData, 1000);
 
     this.subscriptions.set(subscribeUID, {
@@ -140,7 +180,6 @@ class RealTimeManager {
     }
   }
 
-  // تابع برای trigger کردن refetch یک subscription خاص
   triggerRefetch(subscribeUID) {
     if (this.refetchTriggers.has(subscribeUID)) {
       this.refetchTriggers.set(
@@ -153,14 +192,13 @@ class RealTimeManager {
 
 const realTimeManager = new RealTimeManager();
 
-// کامپوننت wrapper برای استفاده از هوک در datafeed
 export const DatafeedWithReactQuery = {
   onReady: (callback) => {
     setTimeout(() => callback(configurationData), 0);
   },
 
   searchSymbols: (userInput, exchange, symbolType, onResultReadyCallback) => {
-    const results = Object.values(symbols).filter(
+    const results = Object.values(currentSymbols).filter(
       (symbol) =>
         symbol.name.toLowerCase().includes(userInput.toLowerCase()) ||
         symbol.symbol.toLowerCase().includes(userInput.toLowerCase()),
@@ -174,9 +212,9 @@ export const DatafeedWithReactQuery = {
     onResolveErrorCallback,
   ) => {
     const symbolInfo =
-      symbols[symbolName] ||
-      Object.values(symbols).find((s) => s.symbol === symbolName) ||
-      Object.values(symbols).find((s) => s.name === symbolName);
+      currentSymbols[symbolName] ||
+      Object.values(currentSymbols).find((s) => s.symbol === symbolName) ||
+      Object.values(currentSymbols).find((s) => s.name === symbolName);
 
     if (symbolInfo) {
       onSymbolResolvedCallback(symbolInfo);
@@ -245,7 +283,6 @@ export const DatafeedWithReactQuery = {
 
   getMarks: (symbolInfo, from, to, onDataCallback, resolution) => {
     try {
-      // فیلتر history در range from/to (trade.time ثانیه، from/to ثانیه)
       const filteredHistory = userHistory
         .filter((trade) => trade.time >= from && trade.time <= to)
         .map((trade, index) => {
@@ -262,7 +299,7 @@ export const DatafeedWithReactQuery = {
             color = "red";
             const pd = new PersianDate(trade.time * 1000);
             tooltipText = `Sell Entry at ${trade.price.toLocaleString()} on ${toEnglishDigits(pd.format("YYYY-MM-DD HH:mm:ss"))}`;
-            label = "S"; // متن داخل circle
+            label = "S";
           }
 
           return {

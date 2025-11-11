@@ -1,13 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { widget } from "./charting_library";
-import Datafeed, { setUserHistory } from "./datafeed_custom";
+import Datafeed, {
+  setSymbolsFromRedux,
+  setUserHistory,
+} from "./datafeed_custom";
 import { useSelector } from "react-redux";
 import { useUserOrderPolling } from "../../../Utilities/Hooks/useUserOrder";
+import { useParams } from "react-router-dom";
 
 const TVChartContainer = () => {
   const chartContainerRef = useRef();
   const tvWidgetRef = useRef(null);
   const chartRef = useRef(null);
+  const { base, quote } = useParams();
+  const marketsDatas = useSelector((state) => state.marketsDatas);
   const userTokenSelector = useSelector((state) => state.userToken);
   const {
     data: pendingOrder,
@@ -15,11 +21,9 @@ const TVChartContainer = () => {
     error,
     refetch,
   } = useUserOrderPolling(userTokenSelector.token, "PENDING");
-
   // ---------React State----------
   const [userPositions, setUserPositions] = useState([]); // حفظ‌شده از کد اولیه
   const [positionLines, setPositionLines] = useState([]); // اضافه برای track/cleanup lines
-
   // ---------Helper Func----------
   const buildUserPositions = useCallback((orders, symbol) => {
     if (!orders || !symbol) return [];
@@ -108,10 +112,15 @@ const TVChartContainer = () => {
     setPositionLines(newPositionLines);
   }, [userPositions, chartRef.current]); // وابستگی‌ها: positions و chart (positionLines رو اضافه نکردم تا loop نشه)
 
+  // ---------Use Effect آپدیت symbols از Redux ----------
+  useEffect(() => {
+    setSymbolsFromRedux(marketsDatas);
+  }, [marketsDatas.data]);
   // ---------Use Effect Create Chart ----------
+
   useEffect(() => {
     const widgetOptions = {
-      symbol: "USDTIRT",
+      symbol: `${base + quote}`,
       datafeed: Datafeed,
       container: chartContainerRef.current,
       library_path: "/charting_library/",
@@ -130,15 +139,18 @@ const TVChartContainer = () => {
       fullscreen: false,
       autosize: true,
       studies_overrides: {},
-      supports_marks: true, // فیکس: فقط true (duplicate حذف)
+      supports_marks: true,
       supports_timescale_marks: false,
       enabled_features: ["two_character_bar_marks_labels"],
       theme: "dark",
       overrides: {
         "mainSeriesProperties.statusViewStyle.showInterval": true,
         "mainSeriesProperties.statusViewStyle.symbolTextSource": "ticker",
-        "paneProperties.backgroundType": "solid", // یا "gradient" برای گرادیان
-        "paneProperties.backgroundColor": "#ffff",
+        "paneProperties.backgroundType": "solid",
+        "paneProperties.background": "#101112",
+      },
+      loading_screen: {
+        backgroundColor: "#101112",
       },
     };
 
@@ -172,7 +184,7 @@ const TVChartContainer = () => {
       tvWidgetRef.current = null;
       chartRef.current = null;
     };
-  }, []);
+  }, [base, quote]);
 
   return React.createElement("div", {
     ref: chartContainerRef,

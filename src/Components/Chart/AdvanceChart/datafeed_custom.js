@@ -286,28 +286,39 @@ export const DatafeedWithReactQuery = {
       const filteredHistory = userHistory
         .filter((trade) => trade.time >= from && trade.time <= to)
         .map((trade, index) => {
-          let color, shape, position, tooltipText, label;
+          let color, tooltipText, label;
           const isBuy =
             trade.type.toLowerCase() === "buy" ||
             (trade.type.toLowerCase() === "long" && trade.isEntry);
           if (isBuy) {
             color = "green";
             const pd = new PersianDate(trade.time * 1000);
-            tooltipText = `Buy Entry at ${trade.price.toLocaleString()} on ${toEnglishDigits(pd.format("YYYY-MM-DD HH:mm:ss"))}`;
+            // console.log(pd);
+            // console.log(trade.time);
+
+            tooltipText = [
+              `Buy Entry at ${trade.price.toLocaleString()}`,
+              `Vol: ${trade.size?.toLocaleString() || "N/A"}`,
+              `on ${toEnglishDigits(pd.format("YYYY-MM-DD HH:mm:ss"))}`,
+            ];
             label = "B";
           } else {
             color = "red";
             const pd = new PersianDate(trade.time * 1000);
-            tooltipText = `Sell Entry at ${trade.price.toLocaleString()} on ${toEnglishDigits(pd.format("YYYY-MM-DD HH:mm:ss"))}`;
+            tooltipText = [
+              `Sell Entry at ${trade.price.toLocaleString()}`,
+              `Vol: ${trade.size?.toLocaleString() || "N/A"}`,
+              `on ${toEnglishDigits(pd.format("YYYY-MM-DD HH:mm:ss"))}`,
+            ];
             label = "S";
           }
-
+          console.log("Tooltip for trade:", tooltipText);
           return {
             id: `mark-${symbolInfo.symbol}-${index}`, // unique id
             time: trade.time, // ثانیه
             color: color, // فیکس: name رنگ
             label: label, // متن داخل circle (B/S)
-            text: [tooltipText], // tooltip hover
+            text: tooltipText, // tooltip hover
             minSize: 16,
             labelFontColor: "#FFFFFF", // سفید برای خوانایی
           };

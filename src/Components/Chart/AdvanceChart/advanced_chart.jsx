@@ -14,6 +14,9 @@ const TVChartContainer = () => {
   const chartRef = useRef(null);
   const { base, quote } = useParams();
   const marketsDatas = useSelector((state) => state.marketsDatas);
+  const { symbolID, precision } = useSelector(
+    (state) => state.symbolIDPrecision,
+  );
   const userTokenSelector = useSelector((state) => state.userToken);
   const {
     data: pendingOrder,
@@ -21,9 +24,15 @@ const TVChartContainer = () => {
     error,
     refetch,
   } = useUserOrderPolling(userTokenSelector.token, "PENDING");
+  const {
+    data: completedOrders,
+    isLoading: completedLoading,
+    error: completedError,
+    refetch: refetchCompleted,
+  } = useUserOrderPolling(userTokenSelector.token, "COMPLETED", symbolID);
   // ---------React State----------
-  const [userPositions, setUserPositions] = useState([]); // حفظ‌شده از کد اولیه
-  const [positionLines, setPositionLines] = useState([]); // اضافه برای track/cleanup lines
+  const [userPositions, setUserPositions] = useState([]);
+  const [positionLines, setPositionLines] = useState([]);
   // ---------Helper Func----------
   const buildUserPositions = useCallback((orders, symbol) => {
     if (!orders || !symbol) return [];
@@ -52,7 +61,70 @@ const TVChartContainer = () => {
         };
       });
   }, []);
-  // ---------Use Effect update positions from pendingOrder (حفظ‌شده از کد اولیه) ----------
+  const buildUserHistory = useCallback((orders) => {
+    if (!orders || !orders.data) return [];
+    return orders.data
+      .filter((order) => order.status === "COMPLETED")
+      .map((order) => {
+        let timestampStr = order.created_at;
+        console.log("Original created_at (UTC):", timestampStr); // برای debug
+
+        // Fix ساده: ساعت رو +3:30 اضافه کن (UTC به local IRST)
+        if (!timestampStr.includes("+") && !timestampStr.includes("Z")) {
+          // microseconds رو حذف کن (.589327)
+          timestampStr = timestampStr.replace(/\.\d{6}/, "");
+
+          // Parse به parts (سال-ماه-روز ساعت:دقیقه:ثانیه)
+          const [datePart, timePart] = timestampStr.split(" ");
+          const [year, month, day] = datePart.split("-");
+          const [hourStr, minStr, secStr] = timePart.split(":");
+
+          let hour = parseInt(hourStr);
+          let min = parseInt(minStr);
+
+          // +3:30 اضافه کن
+          min += 30;
+          if (min >= 60) {
+            min -= 60;
+            hour += 1;
+          }
+          hour += 3;
+          if (hour >= 24) {
+            // اگر overflow، روز رو +1 کن (ساده، فرض بدون DST)
+            const newDate = new Date(
+              new Date(timestampStr).getTime() + 3.5 * 60 * 60 * 1000,
+            ); // fallback
+            timestampStr = newDate.toISOString().slice(0, 19).replace("T", " "); // YYYY-MM-DD HH:mm:ss
+          } else {
+            timestampStr = `${year}-${month}-${day} ${hour.toString().padStart(2, "0")}:${min.toString().padStart(2, "0")}:${secStr}`;
+          }
+        }
+
+        // Debug: چک کن string جدید
+        console.log("Adjusted timestampStr (local IRST):", timestampStr);
+
+        const timestamp = Math.floor(new Date(timestampStr).getTime() / 1000); // unix second UTC درست
+
+        // Debug: نهایی
+        console.log("Final UTC timestamp:", timestamp); // باید 1762938690 باشه (برای 09:11 UTC)
+
+        const price =
+          order.market.quote_currency.id === "IRR"
+            ? parseFloat(order.price) / 10
+            : parseFloat(order.price);
+        const type = order.type.toLowerCase();
+        return {
+          time: timestamp, // UTC درست
+          price: price,
+          type: type,
+          isEntry: true,
+          size: parseFloat(order.amount),
+        };
+      })
+      .sort((a, b) => a.time - b.time);
+  }, []);
+
+  // ---------Use Effect update positions from pendingOrder ----------
   useEffect(() => {
     if (pendingOrder?.data && !isLoading) {
       const currentSymbol = "USDTIRR";
@@ -110,14 +182,30 @@ const TVChartContainer = () => {
       newPositionLines.push(positionLine);
     });
     setPositionLines(newPositionLines);
-  }, [userPositions, chartRef.current]); // وابستگی‌ها: positions و chart (positionLines رو اضافه نکردم تا loop نشه)
+  }, [userPositions, chartRef.current]);
+  // ---------useEffect update Completed Orders ----------
+  useEffect(() => {
+    if (completedOrders?.data && !completedLoading && symbolID) {
+      const history = buildUserHistory(completedOrders);
+      setUserHistory(history);
+    } else if (completedError) {
+      console.error("Error fetching completed orders:", completedError);
+      setUserHistory([]);
+    }
+  }, [
+    completedOrders,
+    completedLoading,
+    completedError,
+    symbolID,
+    buildUserHistory,
+  ]);
 
-  // ---------Use Effect آپدیت symbols از Redux ----------
+  // ---------UseEffect آپدیت symbols از Redux ----------
   useEffect(() => {
     setSymbolsFromRedux(marketsDatas);
   }, [marketsDatas.data]);
-  // ---------Use Effect Create Chart ----------
 
+  // ---------Use Effect Create Chart ----------
   useEffect(() => {
     const widgetOptions = {
       symbol: `${base + quote}`,
@@ -156,22 +244,7 @@ const TVChartContainer = () => {
 
     const tvWidget = new widget(widgetOptions);
     tvWidgetRef.current = tvWidget;
-    const userHistory = [
-      {
-        time: 1762502560,
-        price: 108000,
-        type: "buy",
-        isEntry: true,
-      },
-      {
-        time: 1762509760,
-        price: 108800,
-        type: "sell",
-        isEntry: false,
-      },
-      // ... history دیگه
-    ];
-    setUserHistory(userHistory);
+
     tvWidget.onChartReady(() => {
       const chart = tvWidget.activeChart();
       chartRef.current = chart;

@@ -20,8 +20,6 @@ export default function OrderPlace() {
   const userTokenSelector = useSelector((state) => state.userToken);
   const { base, quote } = useParams();
   const userWalletSelector = useSelector((state) => state.userWallet);
-  // const { refetch } = useUserOrder(userTokenSelector.token, "PENDING");
-
   // --------------
   const [sliderPercent, setSliderPercent] = useState(0);
   const [userBalanceBase, setUserBalanceBase] = useState([]);
@@ -44,7 +42,7 @@ export default function OrderPlace() {
         setLastPrice(parseFloat(lastPriceStr.textContent.replace(/,/g, "")));
       }
     }
-  }, [sliderPercent, inputSizeValue]);
+  }, [sliderPercent]);
 
   const quoteIRR = Func.irtToIrr(quote);
   useEffect(() => {

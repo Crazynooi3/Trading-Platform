@@ -8,6 +8,7 @@ import { getUserWallet } from "../../ReduxConfig/entities/userWallet";
 import Pageination from "../pageination/pageination";
 import "./index.css";
 import { toast } from "react-toastify";
+import { Slider } from "antd";
 
 export default function FuturesOrder() {
   const dispatch = useDispatch();
@@ -192,6 +193,20 @@ export default function FuturesOrder() {
                           {order.market.base_currency.id}
                         </td>
                         <td>
+                          <Slider
+                            className="fixed-width-slider"
+                            value={
+                              (100 * order.completed_amount) / order.amount
+                            }
+                            marks={false}
+                            styles={{
+                              track: { backgroundColor: "green " },
+                              rail: { backgroundColor: "green" },
+                              handle: { display: "none" },
+                            }}
+                            min={0}
+                            max={100}
+                          />
                           {(100 * order.completed_amount) / order.amount} %
                         </td>
                         <td>
@@ -313,13 +328,7 @@ export default function FuturesOrder() {
                             {order.amount - order.completed_amount}{" "}
                             {order.market.base_currency.id}
                           </td>
-                          <td className="pr-2 text-end">
-                            <button
-                              className="bg-fill-fill4 hover:bg-fill-fill6 border-fill-fill2 cursor-pointer rounded-sm border-[0.01px] p-2"
-                              onClick={() => orderCansleHandler(order.id)}>
-                              Cansle Order
-                            </button>
-                          </td>
+                          <td className="pr-2 text-end"></td>
                         </tr>
                       );
                     })}

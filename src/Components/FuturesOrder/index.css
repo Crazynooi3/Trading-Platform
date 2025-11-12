@@ -34,3 +34,7 @@
   display: none;
   background: transparent;
 }
+
+.fixed-width-slider {
+  width: 50%;
+}

@@ -255,14 +255,14 @@ export default function FuturesOrder() {
                     <th className="mb-[1px] pt-[11px] pb-2.5 text-start">
                       Completed Rate
                     </th>
-                    <th className="mb-[1px] pt-[11px] pb-2.5 text-start">
+                    {/* <th className="mb-[1px] pt-[11px] pb-2.5 text-start">
                       Not Completed
-                    </th>
-                    <th className="mb-[1px] pt-[11px] pr-2 pb-2.5 text-end">
+                    </th> */}
+                    {/* <th className="mb-[1px] pt-[11px] pr-2 pb-2.5 text-end">
                       Action
-                    </th>
+                    </th> */}
 
-                    <th></th>
+                    {/* <th></th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -324,11 +324,11 @@ export default function FuturesOrder() {
                             )}{" "}
                             %
                           </td>
-                          <td>
+                          {/* <td>
                             {order.amount - order.completed_amount}{" "}
                             {order.market.base_currency.id}
                           </td>
-                          <td className="pr-2 text-end"></td>
+                          <td className="pr-2 text-end"></td> */}
                         </tr>
                       );
                     })}

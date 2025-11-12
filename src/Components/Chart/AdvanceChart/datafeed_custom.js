@@ -293,9 +293,6 @@ export const DatafeedWithReactQuery = {
           if (isBuy) {
             color = "green";
             const pd = new PersianDate(trade.time * 1000);
-            // console.log(pd);
-            // console.log(trade.time);
-
             tooltipText = [
               `Buy Entry at ${trade.price.toLocaleString()}`,
               `Vol: ${trade.size?.toLocaleString() || "N/A"}`,
@@ -312,7 +309,6 @@ export const DatafeedWithReactQuery = {
             ];
             label = "S";
           }
-          console.log("Tooltip for trade:", tooltipText);
           return {
             id: `mark-${symbolInfo.symbol}-${index}`, // unique id
             time: trade.time, // ثانیه

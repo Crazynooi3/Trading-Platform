@@ -67,14 +67,9 @@ const TVChartContainer = () => {
       .filter((order) => order.status === "COMPLETED")
       .map((order) => {
         let timestampStr = order.created_at;
-        console.log("Original created_at (UTC):", timestampStr); // برای debug
-
-        // Fix ساده: ساعت رو +3:30 اضافه کن (UTC به local IRST)
         if (!timestampStr.includes("+") && !timestampStr.includes("Z")) {
-          // microseconds رو حذف کن (.589327)
           timestampStr = timestampStr.replace(/\.\d{6}/, "");
 
-          // Parse به parts (سال-ماه-روز ساعت:دقیقه:ثانیه)
           const [datePart, timePart] = timestampStr.split(" ");
           const [year, month, day] = datePart.split("-");
           const [hourStr, minStr, secStr] = timePart.split(":");
@@ -82,7 +77,6 @@ const TVChartContainer = () => {
           let hour = parseInt(hourStr);
           let min = parseInt(minStr);
 
-          // +3:30 اضافه کن
           min += 30;
           if (min >= 60) {
             min -= 60;
@@ -90,7 +84,6 @@ const TVChartContainer = () => {
           }
           hour += 3;
           if (hour >= 24) {
-            // اگر overflow، روز رو +1 کن (ساده، فرض بدون DST)
             const newDate = new Date(
               new Date(timestampStr).getTime() + 3.5 * 60 * 60 * 1000,
             ); // fallback
@@ -100,13 +93,7 @@ const TVChartContainer = () => {
           }
         }
 
-        // Debug: چک کن string جدید
-        console.log("Adjusted timestampStr (local IRST):", timestampStr);
-
         const timestamp = Math.floor(new Date(timestampStr).getTime() / 1000); // unix second UTC درست
-
-        // Debug: نهایی
-        console.log("Final UTC timestamp:", timestamp); // باید 1762938690 باشه (برای 09:11 UTC)
 
         const price =
           order.market.quote_currency.id === "IRR"

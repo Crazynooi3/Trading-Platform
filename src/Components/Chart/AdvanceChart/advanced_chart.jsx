@@ -114,7 +114,7 @@ const TVChartContainer = () => {
   // ---------Use Effect update positions from pendingOrder ----------
   useEffect(() => {
     if (pendingOrder?.data && !isLoading) {
-      const currentSymbol = "USDTIRR";
+      const currentSymbol = `${quote === "IRT" ? base + "IRR" : base + quote}`;
       const positions = buildUserPositions(pendingOrder.data, currentSymbol);
       setUserPositions(positions);
     } else if (error) {

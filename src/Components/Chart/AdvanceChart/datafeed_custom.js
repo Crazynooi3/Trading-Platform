@@ -27,12 +27,16 @@ export const configurationData = {
 // تابع برای ساخت symbols از داده‌های marketsData
 const buildSymbols = (marketsData) => {
   return marketsData.reduce((acc, market) => {
-    // فقط بازارهایی که quote_currency.id === 'IRR' هستن رو در نظر بگیر
     if (market.quote_currency.id !== "IRR") return acc;
 
     const baseId = market.base_currency.id;
-    const symbolKey = `${baseId}IRT`; // همیشه IRT برای تومان
-    const baseEnglishName = market.base_currency.currency_name?.en || baseId; // از en استفاده کن
+    const symbolKey = `${baseId}IRT`;
+    const baseEnglishName = market.base_currency.currency_name?.en || baseId;
+
+    // Fix: pricescale dynamic از precision (مثلاً precision=2 → 100, precision=0 → 1)
+    const precision = market.quote_currency.precision || 2; // fallback 2 اگر نداره
+    const pricescale = Math.pow(10, precision);
+    const minmov = 1 / pricescale; // tick size معکوس (مثل 0.01 برای precision=2)
 
     acc[symbolKey] = {
       symbol: symbolKey,
@@ -44,8 +48,8 @@ const buildSymbols = (marketsData) => {
       exchange: "Ompfinex",
       listed_exchange: "Ompfinex",
       timezone: "Asia/Tehran",
-      minmov: 1,
-      pricescale: 100, // می‌تونی بر اساس quote_currency_precision تنظیم کنی، مثلاً Math.pow(10, market.quote_currency_precision)
+      minmov: minmov, // dynamic tick size
+      pricescale: pricescale, // dynamic decimals
       has_intraday: true,
       has_daily: true,
       has_weekly_and_monthly: true,

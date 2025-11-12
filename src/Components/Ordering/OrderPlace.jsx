@@ -26,7 +26,9 @@ export default function OrderPlace() {
   const [userBalanceQuote, setUserBalanceQuote] = useState([]);
   const [avaibleBalanceBase, setAvaibleBalanceBase] = useState(null);
   const [avaibleBalanceQuote, setAvaibleBalanceQuote] = useState(null);
-  const [orderType, setOrderType] = useState("Market");
+  const [orderType, setOrderType] = useState(
+    localStorage.getItem("orderType") || "Market",
+  );
   const [inputSizeValue, setInputSizeValue] = useState("");
   const [inputPriceValue, setInputPriceValue] = useState("");
   const [lastPrice, setLastPrice] = useState(0);
@@ -275,7 +277,8 @@ export default function OrderPlace() {
   const orderTypeHandler = (e) => {
     setIsShowTooltip(false);
     setIsShowTooltipPrice(false);
-    setOrderType(e.target.innerHTML);
+    localStorage.setItem("orderType", e.target.innerHTML);
+    setOrderType(localStorage.getItem("orderType"));
   };
   const formatter = (value) => `${value}%`;
   return (

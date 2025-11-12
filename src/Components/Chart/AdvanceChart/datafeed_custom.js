@@ -294,8 +294,8 @@ export const DatafeedWithReactQuery = {
             color = "green";
             const pd = new PersianDate(trade.time * 1000);
             tooltipText = [
-              `Buy Entry at ${trade.price.toLocaleString()}`,
-              `Vol: ${trade.size?.toLocaleString() || "N/A"}`,
+              `Buy Entry at ${trade.price.toLocaleString()} | `,
+              `Vol: ${trade.size?.toLocaleString() || "N/A"}  | `,
               `on ${toEnglishDigits(pd.format("YYYY-MM-DD HH:mm:ss"))}`,
             ];
             label = "B";
@@ -303,8 +303,8 @@ export const DatafeedWithReactQuery = {
             color = "red";
             const pd = new PersianDate(trade.time * 1000);
             tooltipText = [
-              `Sell Entry at ${trade.price.toLocaleString()}`,
-              `Vol: ${trade.size?.toLocaleString() || "N/A"}`,
+              `Sell Entry at ${trade.price.toLocaleString()} | `,
+              `Vol: ${trade.size?.toLocaleString() || "N/A"}  | `,
               `on ${toEnglishDigits(pd.format("YYYY-MM-DD HH:mm:ss"))}`,
             ];
             label = "S";

@@ -44,7 +44,7 @@ export default function OrderPlace() {
         setLastPrice(parseFloat(lastPriceStr.textContent.replace(/,/g, "")));
       }
     }
-  }, [sliderPercent]);
+  }, [sliderPercent, inputSizeValue]);
 
   const quoteIRR = Func.irtToIrr(quote);
   useEffect(() => {

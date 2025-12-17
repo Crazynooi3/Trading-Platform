@@ -1,12 +1,56 @@
-# React + Vite
+# 🇮🇷 OMPFinex Spot Trading UI - React Clone of Toobit
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ یک UI ساده و فارسی برای ترید اسپات در صرافی OMPFinex، که بر اساس کلون UI از صرافی Toobit با React ساخته شده است. API و WebSocket صرافی OMPFinex به آن متصل شده و تمامی عملیات‌های اسپات (خرید/فروش) پیاده‌سازی شده‌اند. تمای کامپوننت ها بر اساس ویژگی های اصلی صفحه معاملات توبیت مجددا ساخته شده است. نسخه دسکتاپ کامل‌تر است، اما برای موبایل هم بهینه‌سازی شده (هرچند برخی صفحات ممکن است نیاز به بهبود داشته باشند. توجه داشته باشید  که به جهت محدودیت های استفاده از API , WS پروژه صرفا روی https://localhost:4100/ باز میشه و قابل استفاده است. یک Mini Server هم وجود داره که بعضی از مشکلات اتصال از https://localhost:4100/ به API و WS رو برطرف میکنه.
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+نکته مهم: برای استفاده، کاربر باید توکن API خودش را در local storage ذخیره کند. صفحه Trade بدون local storage خالی کار نمی‌کند.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ویژگی ها
+* طراحی مدرن و واکنش‌گرا بر اساس UI صرافی Toobit (با TailwindCSS یا فریم‌ورک مشابه)
+* اتصال واقعی به API و WebSocket OMPFinex برای داده‌های زنده
+* مدیریت ترید اسپات (خرید/فروش) با ورود توکن API در local storage
+نمایش چارت‌ها و داده‌های بازار با کتابخانه‌های* TradingView
+* نوتیفیکیشن‌های کاربرپسند برای معاملات و خطاها (با Toast یا مشابه)
+* ساختار چندصفحه‌ای (Spot, Trade, Wallet) و قابل توسعه
+* لودینگ مناسب برای داده‌های زنده و تغییرات بازار
+
+## تصاویر پروژه
+
+
+<img width="2379" height="1184" alt="image" src="https://github.com/user-attachments/assets/3854e19b-a053-48be-9c4c-caeba0a6b58d" />
+
+
+
+##  راه‌اندازی پروژه
+برای اجرای پروژه مراحل زیر را دنبال کنید:
+
+1. 📥 کلون کردن ریپ
+```bash
+git clone https://github.com/Crazynooi3/react-tailwind-persian-cms
+```
+
+2. 📦 نصب پکیج‌ها
+
+```bash
+npm install
+```
+3. ▶️ اجرای سرور  
+برای اتصال به برخی از API ها و WS ها نیاز به اجرای این سرور می باشد. وارد فایل Server بشین و استارتش کنین
+
+```bash
+npm run start
+```
+4. ▶️ اجرای پروژه
+پروژه با Vite نوشته شده و تست گرفته شده. پس برای اجرا به Root برگردین و vite رو اجرا کنید.
+   
+```bash
+npm run dev
+```
+
+
+
+
+
+
+
